@@ -537,6 +537,1150 @@
     </div>
 </div>
 
+<!-- 作品编辑模态框（仅嵌入代码） -->
+<div id="workEditorModal" class="modal">
+    <div class="modal-content" style="max-width: 700px;">
+        <div class="modal-header">
+            <h3 id="workEditorTitle">编辑作品</h3>
+            <button class="close-modal-btn" id="closeWorkEditorBtn">&times;</button>
+        </div>
+        <div class="form-group">
+            <label>作品标题</label>
+            <input type="text" id="workTitle">
+        </div>
+        <div class="form-group">
+            <label>分类</label>
+            <select id="workCategory">
+                <option value="tvc广告">tvc广告</option>
+                <option value="宣传片">宣传片</option>
+                <option value="预告片">预告片</option>
+                <option value="微电影">微电影</option>
+                <option value="纪录片">纪录片</option>
+                <option value="电视节目">电视节目</option>
+                <option value="短视频">短视频</option>
+                <option value="aigc视频">aigc视频</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>作品描述</label>
+            <textarea id="workDesc" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+            <label>视频嵌入代码（B站/优酷等）</label>
+            <textarea id="workEmbed" rows="3" placeholder='<iframe src="https://player.bilibili.com/player.html?aid=你的视频aid&page=1&high_quality=1&danmaku=0" frameborder="0" allowfullscreen></iframe>'></textarea>
+            <small>从B站复制嵌入代码时，建议添加参数 <code>&high_quality=1&danmaku=0</code> 获得更干净播放器</small>
+        </div>
+        <div class="form-group">
+            <label>作品封面（可选）</label>
+            <input type="file" id="workCoverUpload" accept="image/*">
+            <img id="workCoverPreview" style="max-width: 100%; max-height: 150px; margin-top: 10px; display: none;">
+            <button type="button" id="removeCoverBtn" style="background:#ef4444; margin-top: 8px;">移除封面</button>
+        </div>
+        <div style="margin-top: 24px;">
+            <button id="saveWorkBtn">保存作品</button>
+            <button id="cancelWorkBtn" class="secondary">取消</button>
+        </div>
+    </div>
+</div>
+
+<!-- 视频播放模态框 -->
+<div id="videoModal" class="modal">
+    <div class="modal-content" style="max-width: 1000px;">
+        <div class="modal-header">
+            <h3 id="modalVideoTitle">视频标题</h3>
+            <button class="close-modal-btn" id="closeVideoModalBtn">&times;</button>
+        </div>
+        <div class="modal-video-container" style="position:relative; padding-bottom:56.25%; height:0; background:#000; border-radius:20px; overflow:hidden;">
+            <div id="modalVideoContainer" style="position:absolute; top:0; left:0; width:100%; height:100%;"></div>
+        </div>
+        <div class="modal-description" id="modalVideoDesc" style="padding:16px 8px 0; color:#ccc;"></div>
+    </div>
+</div>
+
+<!-- 导出数据模态框 -->
+<div id="exportModal" class="modal">
+    <div class="modal-content" style="max-width: 800px;">
+        <div class="modal-header">
+            <h3>📤 导出数据（用于 GitHub 更新）</h3>
+            <button class="close-modal-btn" id="closeExportBtn">&times;</button>
+        </div>
+        <p style="margin-bottom: 12px;">复制以下代码，打开 GitHub 仓库中的 <code>index.html</code>，找到 <code>DEFAULT_DATA</code> 的定义并替换为下方内容：</p>
+        <div class="export-code" id="exportCodeBlock"></div>
+        <div style="text-align: right; margin-top: 16px;">
+            <button id="copyExportBtn">📋 复制代码</button>
+            <button id="closeExportBtn2" class="secondary">关闭</button>
+        </div>
+    </div>
+</div>
+
+<!-- 头像裁剪模态框 -->
+<div id="cropModal" class="modal">
+    <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-header">
+            <h3>裁剪头像</h3>
+            <button class="close-modal-btn" id="closeCropBtn">&times;</button>
+        </div>
+        <div style="text-align: center;">
+            <img id="cropImage" style="max-width: 100%; max-height: 400px;">
+        </div>
+        <div style="margin-top: 20px; text-align: center;">
+            <button id="confirmCropBtn">确认裁剪</button>
+            <button id="cancelCropBtn" class="secondary">取消</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ---------- 分类 ----------
+    const CATEGORIES = [
+        "tvc广告", "宣传片", "预告片", "微电影",
+        "纪录片", "电视节目", "短视频", "aigc视频"
+    ];
+
+    // 默认数据（初始示例）
+    const DEFAULT_DATA = {
+        name: "杨崧雨",
+        bio: "拥有9年商业视频后期制作经验，精通从创意到成品的全流程制作。性格沉稳，逻辑性强，善于在复杂的项目需求中理清剪辑思路，把控叙事结构。擅长通过剪辑节奏传递情绪、调色塑造质感、混音增强沉浸感，作品横跨TVC广告、纪录片、宣传片、电视栏目、短视频及AIGC视频领域。具备优秀的沟通与对接能力，能够精准理解导演与甲方的核心诉求，高效推进修改意见落地，确保创作意图与商业需求平衡。同时具备团队管理经验，曾统筹多人协作项目，把控进度与质量标准，能够独立完成高品质商业成片，也能带领团队高效交付。",
+        contact: "📞 13436664086\n📧 920963242@qq.com\n📍 北京 · 30岁",
+        skills: "Final Cut Pro X, Premiere Pro, DaVinci Resolve, After Effects, Runway, 即梦, Pika, 可灵, Midjourney, Stable Diffusion, Topaz, AI配音/AI配乐",
+        works: [
+            { id: "1", title: "中国中车微电影《废材的逆袭》", category: "微电影", description: "独立完成剪辑、混音、调色及现场制片统筹。该作品在国资委微电影大赛中荣获微电影单元一等奖。", embedCode: '<iframe src="https://player.bilibili.com/player.html?aid=示例&page=1&high_quality=1&danmaku=0" frameborder="0" allowfullscreen></iframe>', cover: null },
+            { id: "2", title: "CCTV-12《绿水青山的中国》", category: "电视节目", description: "担任后期统筹，带领20人剪辑团队，对接央视审核，把控质量与周期。", embedCode: '<iframe src="https://player.bilibili.com/player.html?aid=示例&page=1&high_quality=1&danmaku=0" frameborder="0" allowfullscreen></iframe>', cover: null },
+            { id: "3", title: "董宇辉×新华社《向新而行》宁夏篇", category: "宣传片", description: "参与后期剪辑，配合调性完成叙事呈现。", embedCode: '<iframe src="https://player.bilibili.com/player.html?aid=示例&page=1&high_quality=1&danmaku=0" frameborder="0" allowfullscreen></iframe>', cover: null },
+            { id: "4", title: "虚拟数字人「天妤TianYu」", category: "短视频", description: "内容策划+后期负责人，3个月粉丝200万，全网500万+。", embedCode: '<iframe src="https://player.bilibili.com/player.html?aid=示例&page=1&high_quality=1&danmaku=0" frameborder="0" allowfullscreen></iframe>', cover: null }
+        ],
+        avatar: null
+    };
+
+    let appData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+    let isAdmin = false;
+    let currentEditingWorkIndex = null;
+    let cropper = null;
+
+    // Toast 提示
+    function showToast(message, duration = 3000) {
+        const toast = document.createElement('div');
+        toast.innerText = message;
+        toast.style.position = 'fixed';
+        toast.style.bottom = '80px';
+        toast.style.right = '32px';
+        toast.style.background = '#f5b042';
+        toast.style.color = '#0a0a0a';
+        toast.style.padding = '10px 20px';
+        toast.style.borderRadius = '40px';
+        toast.style.fontSize = '0.9rem';
+        toast.style.fontWeight = '500';
+        toast.style.zIndex = '1001';
+        toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), duration);
+    }
+
+    function loadData() {
+        const saved = localStorage.getItem("blackGoldPortfolio");
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                appData = { ...DEFAULT_DATA, ...parsed };
+                if (!appData.works) appData.works = [...DEFAULT_DATA.works];
+                if (!appData.avatar) appData.avatar = null;
+                appData.works.forEach(w => { if (w.cover === undefined) w.cover = null; });
+            } catch(e) {}
+        }
+    }
+
+    function saveData() {
+        localStorage.setItem("blackGoldPortfolio", JSON.stringify(appData));
+        showToast("✅ 已保存到本地");
+    }
+
+    function renderAvatar() {
+        const img = document.getElementById("avatarImg");
+        const placeholder = document.getElementById("avatarPlaceholder");
+        if (appData.avatar && appData.avatar.startsWith("data:image")) {
+            img.src = appData.avatar;
+            img.style.display = "block";
+            placeholder.style.display = "none";
+        } else {
+            img.style.display = "none";
+            placeholder.style.display = "flex";
+        }
+    }
+
+    function renderFrontend() {
+        document.getElementById("displayName").innerText = appData.name;
+        document.getElementById("displayBio").innerHTML = appData.bio.replace(/\n/g, '<br>');
+        const contactLines = appData.contact.split('\n').filter(l => l.trim());
+        const contactHtml = contactLines.map(line => {
+            let text = escapeHtml(line);
+            if (line.includes('@')) {
+                return `<a href="mailto:${line.replace(/[^\w@.-]/g, '')}">${text}</a>`;
+            } else if (line.match(/1[3-9]\d{9}/)) {
+                const phone = line.match(/1[3-9]\d{9}/)[0];
+                return `<a href="tel:${phone}">${text}</a>`;
+            } else {
+                return `<span>${text}</span>`;
+            }
+        }).join('');
+        document.getElementById("displayContact").innerHTML = contactHtml;
+
+        const skillList = appData.skills.split(/[ ,，]+/).filter(s => s.trim());
+        document.getElementById("displaySkills").innerHTML = skillList.map(s => `<span class="skill-badge">${escapeHtml(s.trim())}</span>`).join('');
+
+        const filterBar = document.getElementById("filterBar");
+        filterBar.innerHTML = `<button class="filter-btn active" data-cat="all">全部</button>` +
+            CATEGORIES.map(cat => `<button class="filter-btn" data-cat="${cat}">${cat}</button>`).join('');
+        attachFilterEvents();
+        renderWorks('all');
+        renderAvatar();
+    }
+
+    function attachFilterEvents() {
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.removeEventListener('click', filterHandler);
+            btn.addEventListener('click', filterHandler);
+        });
+    }
+
+    function filterHandler(e) {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        renderWorks(e.target.dataset.cat);
+    }
+
+    function renderWorks(category) {
+        const grid = document.getElementById("worksGrid");
+        let filtered = [...appData.works];
+        if (category !== 'all') {
+            filtered = filtered.filter(w => w.category === category);
+        }
+        if (filtered.length === 0) {
+            grid.innerHTML = `<div class="empty-state">✨ 暂无作品，管理员可登录后添加</div>`;
+            return;
+        }
+        grid.innerHTML = filtered.map(work => `
+            <div class="work-card" data-work-id="${work.id}">
+                <div class="media-container">
+                    ${work.embedCode && work.embedCode.trim() !== '' ? work.embedCode : (work.cover ? `<img src="${work.cover}" alt="封面">` : '<div style="background:#1a1a1a; height:100%; display:flex; align-items:center; justify-content:center;">无视频</div>')}
+                </div>
+                <div class="work-info">
+                    <div class="work-title">${escapeHtml(work.title)}</div>
+                    <div class="work-cat">${work.category}</div>
+                    <div class="work-desc">${escapeHtml(work.description)}</div>
+                </div>
+            </div>
+        `).join('');
+
+        document.querySelectorAll('.work-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                const workId = card.dataset.workId;
+                const work = appData.works.find(w => w.id === workId);
+                if (work) openVideoModal(work);
+            });
+        });
+    }
+
+    function openVideoModal(work) {
+        const modal = document.getElementById('videoModal');
+        const titleElem = document.getElementById('modalVideoTitle');
+        const descElem = document.getElementById('modalVideoDesc');
+        const container = document.getElementById('modalVideoContainer');
+        titleElem.innerText = work.title;
+        descElem.innerText = work.description;
+        container.innerHTML = '';
+        if (work.embedCode && work.embedCode.trim() !== '') {
+            const iframe = document.createElement('iframe');
+            iframe.src = work.embedCode.match(/src="([^"]+)"/)?.[1] || '';
+            iframe.allowFullscreen = true;
+            iframe.style.width = '100%';
+            iframe.style.height = '100%';
+            iframe.style.border = '0';
+            container.appendChild(iframe);
+        } else if (work.cover) {
+            const img = document.createElement('img');
+            img.src = work.cover;
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'contain';
+            container.appendChild(img);
+        } else {
+            container.innerHTML = '<div style="display:flex; align-items:center; justify-content:center; height:100%;">无法播放</div>';
+        }
+        modal.style.display = 'flex';
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    // 管理员界面
+    function renderAdminButton() {
+        const container = document.getElementById("adminControl");
+        if (isAdmin) {
+            container.innerHTML = `<button class="admin-btn" id="openAdminBtn">⚙️</button>`;
+            document.getElementById("openAdminBtn").addEventListener("click", openAdminModal);
+        } else {
+            container.innerHTML = `<button class="admin-login-btn" id="showLoginBtn">🔐</button>`;
+            document.getElementById("showLoginBtn").addEventListener("click", () => {
+                document.getElementById("loginModal").style.display = "flex";
+            });
+        }
+    }
+
+    function renderWorksManager() {
+        const container = document.getElementById("worksManager");
+        if (!appData.works) appData.works = [];
+        container.innerHTML = appData.works.map((work, idx) => `
+            <div class="work-item" data-idx="${idx}">
+                <div><strong>${escapeHtml(work.title)}</strong> (${work.category})</div>
+                <div style="font-size:0.85rem;">${escapeHtml(work.description.substring(0, 80))}</div>
+                <div class="work-actions">
+                    <button type="button" class="edit-work" data-idx="${idx}">编辑</button>
+                    <button type="button" class="delete-work" data-idx="${idx}" style="background:#ef4444;">删除</button>
+                </div>
+            </div>
+        `).join('');
+        if (appData.works.length === 0) container.innerHTML = '<p>暂无作品，点击添加</p>';
+        document.querySelectorAll('.edit-work').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const idx = parseInt(btn.dataset.idx);
+                openWorkEditor(idx);
+            });
+        });
+        document.querySelectorAll('.delete-work').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const idx = parseInt(btn.dataset.idx);
+                if (confirm('删除该作品？')) {
+                    appData.works.splice(idx, 1);
+                    renderWorksManager();
+                    saveData();
+                    renderFrontend();
+                }
+            });
+        });
+    }
+
+    function openWorkEditor(idx) {
+        const work = appData.works[idx];
+        if (!work) return;
+        currentEditingWorkIndex = idx;
+        document.getElementById("workTitle").value = work.title;
+        document.getElementById("workCategory").value = work.category;
+        document.getElementById("workDesc").value = work.description;
+        document.getElementById("workEmbed").value = work.embedCode || '';
+        if (work.cover) {
+            document.getElementById("workCoverPreview").src = work.cover;
+            document.getElementById("workCoverPreview").style.display = "block";
+        } else {
+            document.getElementById("workCoverPreview").style.display = "none";
+        }
+        document.getElementById("workEditorModal").style.display = "flex";
+    }
+
+    function closeWorkEditor() {
+        document.getElementById("workEditorModal").style.display = "none";
+        currentEditingWorkIndex = null;
+        document.getElementById("workCoverUpload").value = '';
+    }
+
+    function saveWork() {
+        if (currentEditingWorkIndex === null) return;
+        const title = document.getElementById("workTitle").value.trim();
+        if (!title) {
+            showToast("请输入作品标题");
+            return;
+        }
+        const category = document.getElementById("workCategory").value;
+        const desc = document.getElementById("workDesc").value;
+        const embed = document.getElementById("workEmbed").value;
+        const work = appData.works[currentEditingWorkIndex];
+        work.title = title;
+        work.category = category;
+        work.description = desc;
+        work.embedCode = embed;
+
+        const coverFile = document.getElementById("workCoverUpload").files[0];
+        if (coverFile) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                work.cover = e.target.result;
+                saveData();
+                renderWorksManager();
+                renderFrontend();
+                closeWorkEditor();
+            };
+            reader.readAsDataURL(coverFile);
+        } else {
+            saveData();
+            renderWorksManager();
+            renderFrontend();
+            closeWorkEditor();
+        }
+    }
+
+    function addNewWork() {
+        const newWork = {
+            id: Date.now().toString(),
+            title: "新作品标题",
+            category: "短视频",
+            description: "作品描述，可自行修改。",
+            embedCode: '<iframe src="https://player.bilibili.com/player.html?aid=请替换&page=1&high_quality=1&danmaku=0" frameborder="0" allowfullscreen></iframe>',
+            cover: null
+        };
+        appData.works.push(newWork);
+        renderWorksManager();
+        saveData();
+        renderFrontend();
+        openWorkEditor(appData.works.length - 1);
+    }
+
+    // 头像裁剪相关
+    function showCropModal(file) {
+        const img = document.getElementById("cropImage");
+        const url = URL.createObjectURL(file);
+        img.src = url;
+        document.getElementById("cropModal").style.display = "flex";
+        if (cropper) cropper.destroy();
+        cropper = new Cropper(img, {
+            aspectRatio: 1,
+            viewMode: 1,
+            dragMode: 'move',
+            cropBoxMovable: true,
+            cropBoxResizable: true,
+        });
+    }
+
+    function confirmCrop() {
+        if (!cropper) return;
+        const canvas = cropper.getCroppedCanvas();
+        const base64 = canvas.toDataURL('image/jpeg', 0.9);
+        appData.avatar = base64;
+        saveData();
+        renderFrontend();
+        const previewImg = document.getElementById("adminAvatarPreview");
+        const previewPlaceholder = document.getElementById("adminAvatarPlaceholder");
+        previewImg.src = base64;
+        previewImg.style.display = "block";
+        previewPlaceholder.style.display = "none";
+        closeCropModal();
+    }
+
+    function closeCropModal() {
+        document.getElementById("cropModal").style.display = "none";
+        if (cropper) {
+            cropper.destroy();
+            cropper = null;
+        }
+    }
+
+    function openAdminModal() {
+        document.getElementById("editName").value = appData.name;
+        document.getElementById("editBio").value = appData.bio;
+        document.getElementById("editContact").value = appData.contact;
+        document.getElementById("editSkills").value = appData.skills;
+        const previewImg = document.getElementById("adminAvatarPreview");
+        const previewPlaceholder = document.getElementById("adminAvatarPlaceholder");
+        if (appData.avatar) {
+            previewImg.src = appData.avatar;
+            previewImg.style.display = "block";
+            previewPlaceholder.style.display = "none";
+        } else {
+            previewImg.style.display = "none";
+            previewPlaceholder.style.display = "flex";
+        }
+        renderWorksManager();
+        document.getElementById("adminModal").style.display = "flex";
+    }
+
+    function closeAdminModal() {
+        document.getElementById("adminModal").style.display = "none";
+    }
+
+    function saveAdminChanges() {
+        appData.name = document.getElementById("editName").value.trim();
+        appData.bio = document.getElementById("editBio").value;
+        appData.contact = document.getElementById("editContact").value;
+        appData.skills = document.getElementById("editSkills").value;
+        saveData();
+        renderFrontend();
+        closeAdminModal();
+    }
+
+    function handleAvatarUpload(file) {
+        if (!file) return;
+        showCropModal(file);
+    }
+
+    // 导出数据功能
+    function showExportModal() {
+        const exportData = {
+            name: appData.name,
+            bio: appData.bio,
+            contact: appData.contact,
+            skills: appData.skills,
+            works: appData.works,
+            avatar: appData.avatar
+        };
+        const exportStr = JSON.stringify(exportData, null, 2);
+        const codeBlock = document.getElementById('exportCodeBlock');
+        codeBlock.innerText = `const DEFAULT_DATA = ${exportStr};`;
+        document.getElementById('exportModal').style.display = 'flex';
+    }
+
+    function closeExportModal() {
+        document.getElementById('exportModal').style.display = 'none';
+    }
+
+    function copyExportCode() {
+        const code = document.getElementById('exportCodeBlock').innerText;
+        navigator.clipboard.writeText(code).then(() => {
+            showToast('✅ 代码已复制，请到 GitHub 仓库中替换 DEFAULT_DATA');
+        }).catch(() => {
+            alert('复制失败，请手动复制');
+        });
+    }
+
+    function attemptLogin() {
+        const pwd = document.getElementById("adminPassword").value;
+        if (pwd === "ysy2025") {
+            isAdmin = true;
+            sessionStorage.setItem("blackGoldAdmin", "true");
+            closeLoginModal();
+            renderAdminButton();
+            showToast("管理员模式已开启");
+        } else {
+            showToast("密码错误");
+        }
+    }
+
+    function closeLoginModal() {
+        document.getElementById("loginModal").style.display = "none";
+        document.getElementById("adminPassword").value = "";
+    }
+
+    function checkAdminStatus() {
+        if (sessionStorage.getItem("blackGoldAdmin") === "true") {
+            isAdmin = true;
+        } else {
+            isAdmin = false;
+        }
+        renderAdminButton();
+    }
+
+    function init() {
+        loadData();
+        renderFrontend();
+        checkAdminStatus();
+
+        document.getElementById("submitLoginBtn").addEventListener("click", attemptLogin);
+        document.getElementById("closeLoginBtn").addEventListener("click", closeLoginModal);
+        document.getElementById("cancelLoginBtn").addEventListener("click", closeLoginModal);
+        document.getElementById("closeAdminModalBtn").addEventListener("click", closeAdminModal);
+        document.getElementById("cancelAdminBtn").addEventListener("click", closeAdminModal);
+        document.getElementById("adminForm").addEventListener("submit", (e) => {
+            e.preventDefault();
+            saveAdminChanges();
+        });
+        document.getElementById("addWorkBtn").addEventListener("click", addNewWork);
+        document.getElementById("avatarUpload").addEventListener("change", (e) => {
+            if (e.target.files && e.target.files[0]) {
+                handleAvatarUpload(e.target.files[0]);
+            }
+        });
+        document.getElementById("closeWorkEditorBtn").addEventListener("click", closeWorkEditor);
+        document.getElementById("cancelWorkBtn").addEventListener("click", closeWorkEditor);
+        document.getElementById("saveWorkBtn").addEventListener("click", saveWork);
+        document.getElementById("workCoverUpload").addEventListener("change", (e) => {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    document.getElementById("workCoverPreview").src = ev.target.result;
+                    document.getElementById("workCoverPreview").style.display = "block";
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+        document.getElementById("removeCoverBtn").addEventListener("click", () => {
+            document.getElementById("workCoverPreview").style.display = "none";
+            document.getElementById("workCoverPreview").src = "";
+            document.getElementById("workCoverUpload").value = '';
+            if (currentEditingWorkIndex !== null) {
+                appData.works[currentEditingWorkIndex].cover = null;
+            }
+        });
+
+        document.getElementById("closeCropBtn").addEventListener("click", closeCropModal);
+        document.getElementById("cancelCropBtn").addEventListener("click", closeCropModal);
+        document.getElementById("confirmCropBtn").addEventListener("click", confirmCrop);
+
+        document.getElementById("closeVideoModalBtn").addEventListener("click", () => {
+            document.getElementById("videoModal").style.display = "none";
+        });
+
+        // 导出功能绑定
+        document.getElementById("exportDataBtn").addEventListener("click", showExportModal);
+        document.getElementById("closeExportBtn").addEventListener("click", closeExportModal);
+        document.getElementById("closeExportBtn2").addEventListener("click", closeExportModal);
+        document.getElementById("copyExportBtn").addEventListener("click", copyExportCode);
+
+        window.onclick = function(e) {
+            if (e.target === document.getElementById("loginModal")) closeLoginModal();
+            if (e.target === document.getElementById("adminModal")) closeAdminModal();
+            if (e.target === document.getElementById("workEditorModal")) closeWorkEditor();
+            if (e.target === document.getElementById("cropModal")) closeCropModal();
+            if (e.target === document.getElementById("videoModal")) document.getElementById("videoModal").style.display = "none";
+            if (e.target === document.getElementById("exportModal")) closeExportModal();
+        };
+    }
+
+    init();
+</script>
+</body>
+</html><!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>杨崧雨 · 作品集</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            font-family: 'Inter', -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+            color: #e8e8e8;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        .hero {
+            background: #0f0f0f;
+            padding: 80px 0 60px;
+            border-bottom: 1px solid rgba(245, 176, 66, 0.2);
+            margin-bottom: 40px;
+        }
+
+        .hero-inner {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 48px;
+        }
+
+        .avatar-wrapper {
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .avatar-img {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #f5b042;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+        }
+        .avatar-img:hover {
+            transform: scale(1.02);
+        }
+        .avatar-placeholder {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: #1a1a1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #f5b042;
+            font-size: 14px;
+            border: 1px solid #2c2c2c;
+        }
+
+        .hero-info {
+            flex: 1;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #ffffff 0%, #f5b042 80%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero-tag {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #f5b042;
+            margin-bottom: 24px;
+            border-left: 3px solid #f5b042;
+            padding-left: 16px;
+        }
+
+        .contact-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 8px;
+        }
+
+        .contact-bar a, .contact-bar span {
+            background: #141414;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            color: #e0e0e0;
+            text-decoration: none;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #2a2a2a;
+        }
+        .contact-bar a:hover {
+            background: #f5b042;
+            color: #0a0a0a;
+            border-color: #f5b042;
+            transform: translateY(-2px);
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            margin-bottom: 48px;
+            position: relative;
+            display: inline-block;
+            color: #f5b042;
+        }
+        .section-title::before {
+            content: "🎬";
+            font-size: 1.6rem;
+            margin-right: 12px;
+            opacity: 0.8;
+        }
+        .section-title::after {
+            content: "";
+            position: absolute;
+            bottom: -12px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: #f5b042;
+            border-radius: 2px;
+        }
+
+        .about-card {
+            background: #111111;
+            border-radius: 28px;
+            padding: 40px 48px;
+            margin-bottom: 72px;
+            border: 1px solid #222222;
+            transition: border-color 0.2s;
+        }
+        .about-card:hover {
+            border-color: #f5b042;
+        }
+        .about-text {
+            font-size: 1rem;
+            color: #cccccc;
+            line-height: 1.6;
+        }
+
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 72px;
+        }
+        .skill-badge {
+            background: #141414;
+            color: #f5b042;
+            padding: 6px 20px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            border: 1px solid #2a2a2a;
+        }
+        .skill-badge:hover {
+            background: rgba(245, 176, 66, 0.1);
+            transform: translateY(-2px);
+            border-color: #f5b042;
+        }
+
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 48px;
+            border-bottom: 1px solid #222222;
+            padding-bottom: 20px;
+        }
+        .filter-btn {
+            background: transparent;
+            border: none;
+            padding: 8px 24px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #a0a0a0;
+            border-radius: 40px;
+        }
+        .filter-btn.active {
+            background: #f5b042;
+            color: #0a0a0a;
+        }
+        .filter-btn:hover:not(.active) {
+            color: #f5b042;
+            background: rgba(245, 176, 66, 0.1);
+        }
+
+        .works-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 40px;
+        }
+        .work-card {
+            background: #111111;
+            border-radius: 24px;
+            overflow: hidden;
+            transition: all 0.2s;
+            border: 1px solid #222222;
+            cursor: pointer;
+        }
+        .work-card:hover {
+            transform: translateY(-4px);
+            border-color: #f5b042;
+            box-shadow: 0 20px 30px -12px rgba(0,0,0,0.5);
+        }
+        .media-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            background: #0a0a0a;
+            overflow: hidden;
+        }
+        .media-container iframe,
+        .media-container img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            object-fit: cover;
+        }
+        .work-info {
+            padding: 24px;
+        }
+        .work-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #ffffff;
+        }
+        .work-cat {
+            display: inline-block;
+            background: rgba(245, 176, 66, 0.15);
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #f5b042;
+            margin-bottom: 12px;
+        }
+        .work-desc {
+            color: #aaa;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            background: #111111;
+            border-radius: 28px;
+            color: #666;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(8px);
+        }
+        .modal-content {
+            background: #121212;
+            border-radius: 32px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 24px;
+            position: relative;
+            border: 1px solid #2a2a2a;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding: 0 8px;
+        }
+        .modal-header h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #f5b042;
+        }
+        .close-modal-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #aaa;
+            transition: color 0.2s;
+        }
+        .close-modal-btn:hover {
+            color: #f5b042;
+        }
+        .form-group {
+            margin-bottom: 24px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #ddd;
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            background: #1e1e1e;
+            border: 1px solid #2c2c2c;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            color: #f0f0f0;
+        }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none;
+            border-color: #f5b042;
+        }
+        button {
+            background: #f5b042;
+            color: #0a0a0a;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-right: 12px;
+            transition: 0.2s;
+        }
+        button.secondary {
+            background: #2a2a2a;
+            color: #e0e0e0;
+        }
+        .work-item {
+            background: #1e1e1e;
+            padding: 16px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+            border-left: 4px solid #f5b042;
+        }
+        .work-actions {
+            margin-top: 12px;
+            display: flex;
+            gap: 12px;
+        }
+        .export-code {
+            background: #1e1e1e;
+            padding: 16px;
+            border-radius: 12px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 300px;
+            overflow: auto;
+            margin: 16px 0;
+        }
+        footer {
+            text-align: center;
+            margin-top: 80px;
+            padding: 32px;
+            font-size: 0.8rem;
+            color: #666;
+            border-top: 1px solid #222;
+        }
+
+        .admin-login-btn, .admin-btn {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            background: #f5b042;
+            color: #0a0a0a;
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 100;
+            transition: 0.2s;
+            border: none;
+            font-size: 24px;
+            font-weight: 500;
+        }
+        .admin-btn {
+            background: #f5b042;
+        }
+        .admin-login-btn:hover, .admin-btn:hover {
+            transform: scale(1.05);
+            background: #e6a530;
+        }
+
+        @media (max-width: 640px) {
+            .container { padding: 0 24px; }
+            .hero-inner { flex-direction: column; text-align: center; }
+            .contact-bar { justify-content: center; }
+            .about-card { padding: 28px; }
+            .hero h1 { font-size: 2.2rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="hero">
+    <div class="container">
+        <div class="hero-inner">
+            <div class="avatar-wrapper">
+                <img id="avatarImg" class="avatar-img" src="" alt="头像" style="display: none;">
+                <div id="avatarPlaceholder" class="avatar-placeholder">📷</div>
+            </div>
+            <div class="hero-info">
+                <h1 id="displayName">杨崧雨</h1>
+                <div class="hero-tag" id="displayTagline">剪辑 · 调色 · 混音 · AIGC · 全流程叙事</div>
+                <div class="contact-bar" id="displayContact"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="about-card">
+        <div class="section-title">个人简介</div>
+        <div class="about-text" id="displayBio"></div>
+    </div>
+
+    <div class="section-title">技能标签</div>
+    <div class="skills" id="displaySkills"></div>
+
+    <div class="section-title">个人作品集</div>
+    <div class="filter-bar" id="filterBar"></div>
+    <div id="worksGrid" class="works-grid"></div>
+</div>
+
+<footer>© 杨崧雨 · 影像叙事者 | 数据存储于本地，管理员可登录更新</footer>
+
+<div id="adminControl"></div>
+
+<!-- 登录模态框 -->
+<div id="loginModal" class="modal">
+    <div class="modal-content" style="max-width: 400px;">
+        <div class="modal-header">
+            <h3>🔐 管理员登录</h3>
+            <button class="close-modal-btn" id="closeLoginBtn">&times;</button>
+        </div>
+        <div class="form-group">
+            <label>密码</label>
+            <input type="password" id="adminPassword" placeholder="输入管理员密码">
+        </div>
+        <button id="submitLoginBtn">登录</button>
+        <button id="cancelLoginBtn" class="secondary">取消</button>
+    </div>
+</div>
+
+<!-- 管理模态框 -->
+<div id="adminModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>⚙️ 后台管理</h3>
+            <button class="close-modal-btn" id="closeAdminModalBtn">&times;</button>
+        </div>
+        <form id="adminForm">
+            <div class="form-group">
+                <label>头像（可裁剪）</label>
+                <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+                    <img id="adminAvatarPreview" style="width:80px;height:80px;border-radius:50%;object-fit:cover;display:none;">
+                    <div id="adminAvatarPlaceholder" style="width:80px;height:80px;border-radius:50%;background:#1e1e1e;display:flex;align-items:center;justify-content:center;">无</div>
+                    <input type="file" id="avatarUpload" accept="image/*">
+                </div>
+                <small>上传后自动弹出裁剪窗口</small>
+            </div>
+            <div class="form-group">
+                <label>姓名</label>
+                <input type="text" id="editName">
+            </div>
+            <div class="form-group">
+                <label>个人简介</label>
+                <textarea id="editBio" rows="4"></textarea>
+            </div>
+            <div class="form-group">
+                <label>联系方式（一行一个，支持邮箱、电话）</label>
+                <textarea id="editContact" rows="3" placeholder="📞 13436664086&#10;📧 920963242@qq.com"></textarea>
+            </div>
+            <div class="form-group">
+                <label>技能标签（用逗号或空格分隔）</label>
+                <input type="text" id="editSkills">
+            </div>
+            <div class="form-group">
+                <label>作品管理</label>
+                <div id="worksManager"></div>
+                <button type="button" id="addWorkBtn" style="margin-top:12px;">+ 添加作品</button>
+            </div>
+            <div style="margin-top: 16px; display: flex; gap: 12px; flex-wrap: wrap;">
+                <button type="submit">保存所有更改</button>
+                <button type="button" id="exportDataBtn" style="background:#6c757d;">📤 导出数据（用于 GitHub 更新）</button>
+                <button type="button" id="cancelAdminBtn" class="secondary">取消</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- 作品编辑模态框（仅嵌入代码，无本地视频） -->
 <div id="workEditorModal" class="modal">
     <div class="modal-content" style="max-width: 700px;">
