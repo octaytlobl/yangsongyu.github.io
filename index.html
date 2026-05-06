@@ -22,7 +22,6 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* 电影元素：胶片颗粒背景 */
         body::before {
             content: "";
             position: fixed;
@@ -44,7 +43,6 @@
             z-index: 2;
         }
 
-        /* 头部 - 左右排版 */
         .hero {
             padding: 80px 0 60px;
             display: flex;
@@ -54,9 +52,11 @@
             border-bottom: 1px solid rgba(245,176,66,0.2);
             margin-bottom: 60px;
         }
+
         .avatar-wrapper {
             flex-shrink: 0;
         }
+
         .avatar-img {
             width: 140px;
             height: 140px;
@@ -65,6 +65,7 @@
             border: 3px solid #f5b042;
             box-shadow: 0 8px 20px rgba(0,0,0,0.3);
         }
+
         .avatar-placeholder {
             width: 140px;
             height: 140px;
@@ -77,9 +78,11 @@
             font-size: 14px;
             border: 1px solid #2c2c2c;
         }
+
         .hero-info {
             flex: 1;
         }
+
         .hero h1 {
             font-size: 3.5rem;
             font-weight: 700;
@@ -90,6 +93,7 @@
             color: transparent;
             margin-bottom: 12px;
         }
+
         .hero-tag {
             font-size: 1rem;
             font-weight: 500;
@@ -98,11 +102,13 @@
             border-left: 3px solid #f5b042;
             padding-left: 16px;
         }
+
         .contact-bar {
             display: flex;
             flex-wrap: wrap;
             gap: 16px;
         }
+
         .contact-bar a, .contact-bar span {
             background: rgba(255,255,255,0.05);
             backdrop-filter: blur(10px);
@@ -114,13 +120,13 @@
             transition: all 0.2s;
             border: 1px solid rgba(245,176,66,0.3);
         }
+
         .contact-bar a:hover {
             background: #f5b042;
             color: #0a0a0a;
             border-color: #f5b042;
         }
 
-        /* 章节标题 - 电影场记板装饰 */
         .section-title {
             font-size: 1.8rem;
             font-weight: 600;
@@ -130,12 +136,12 @@
             gap: 12px;
             color: #f5b042;
         }
+
         .section-title i {
             font-size: 1.8rem;
             font-style: normal;
         }
 
-        /* 个人简介卡片 - 减少留白 */
         .about-card {
             background: rgba(20,20,22,0.7);
             backdrop-filter: blur(8px);
@@ -144,19 +150,20 @@
             margin-bottom: 20px;
             border: 1px solid rgba(245,176,66,0.2);
         }
+
         .about-text {
             font-size: 0.95rem;
             color: #ccc;
             line-height: 1.6;
         }
 
-        /* 技能标签 */
         .skills {
             display: flex;
             flex-wrap: wrap;
             gap: 12px;
             margin-bottom: 60px;
         }
+
         .skill-badge {
             background: rgba(245,176,66,0.1);
             border: 1px solid rgba(245,176,66,0.3);
@@ -167,12 +174,12 @@
             font-weight: 500;
             transition: all 0.2s;
         }
+
         .skill-badge:hover {
             background: rgba(245,176,66,0.2);
             transform: translateY(-2px);
         }
 
-        /* 筛选栏 */
         .filter-bar {
             display: flex;
             flex-wrap: wrap;
@@ -180,6 +187,7 @@
             gap: 12px;
             margin-bottom: 48px;
         }
+
         .filter-btn {
             background: transparent;
             border: 1px solid rgba(245,176,66,0.3);
@@ -191,22 +199,24 @@
             color: #aaa;
             border-radius: 40px;
         }
+
         .filter-btn.active {
             background: #f5b042;
             color: #0a0a0a;
             border-color: #f5b042;
         }
+
         .filter-btn:hover:not(.active) {
             border-color: #f5b042;
             color: #f5b042;
         }
 
-        /* 作品网格 */
         .works-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
             gap: 40px;
         }
+
         .work-card {
             background: rgba(20,20,22,0.8);
             backdrop-filter: blur(8px);
@@ -217,6 +227,7 @@
             cursor: pointer;
             position: relative;
         }
+
         .work-card::before {
             content: "🎥";
             position: absolute;
@@ -227,36 +238,63 @@
             z-index: 1;
             pointer-events: none;
         }
+
         .work-card:hover {
             transform: translateY(-6px);
             border-color: #f5b042;
             box-shadow: 0 20px 35px -12px rgba(0,0,0,0.5);
         }
+
         .media-container {
             position: relative;
             padding-bottom: 56.25%;
             height: 0;
             background: #000;
         }
-        .media-container iframe,
+
         .media-container img {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            border: 0;
             object-fit: cover;
         }
+
+        .media-container .play-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: rgba(0,0,0,0.6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            color: #f5b042;
+            backdrop-filter: blur(4px);
+            pointer-events: none;
+            transition: 0.2s;
+        }
+
+        .work-card:hover .play-icon {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
         .work-info {
             padding: 20px;
         }
+
         .work-title {
             font-size: 1.2rem;
             font-weight: 600;
             margin-bottom: 8px;
             color: #fff;
         }
+
         .work-cat {
             display: inline-block;
             background: rgba(245,176,66,0.15);
@@ -267,6 +305,7 @@
             color: #f5b042;
             margin-bottom: 10px;
         }
+
         .work-desc {
             color: #aaa;
             font-size: 0.85rem;
@@ -281,7 +320,6 @@
             color: #888;
         }
 
-        /* 模态框样式 */
         .modal {
             display: none;
             position: fixed;
@@ -295,26 +333,32 @@
             align-items: center;
             backdrop-filter: blur(8px);
         }
+
         .modal-content {
             background: #121212;
             border-radius: 32px;
-            max-width: 900px;
+            max-width: 1000px;
             width: 90%;
-            max-height: 85vh;
-            overflow-y: auto;
-            padding: 24px;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
             border: 1px solid #2a2a2a;
         }
+
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
+            padding: 16px 24px;
+            border-bottom: 1px solid #2a2a2a;
         }
+
         .modal-header h3 {
             color: #f5b042;
-            font-size: 1.4rem;
+            font-size: 1.2rem;
         }
+
         .close-modal-btn {
             background: none;
             border: none;
@@ -322,18 +366,45 @@
             cursor: pointer;
             color: #aaa;
         }
+
         .close-modal-btn:hover {
             color: #f5b042;
         }
+
+        .modal-video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            background: #000;
+        }
+
+        .modal-video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        .modal-description {
+            padding: 16px 24px;
+            color: #ccc;
+            border-top: 1px solid #2a2a2a;
+        }
+
+        /* 后台管理样式 */
         .form-group {
             margin-bottom: 24px;
         }
+
         .form-group label {
             display: block;
             font-weight: 500;
             margin-bottom: 8px;
             color: #ddd;
         }
+
         .form-group input, .form-group textarea, .form-group select {
             width: 100%;
             padding: 12px 16px;
@@ -342,6 +413,7 @@
             border-radius: 20px;
             color: #f0f0f0;
         }
+
         button {
             background: #f5b042;
             color: #0a0a0a;
@@ -352,10 +424,12 @@
             cursor: pointer;
             margin-right: 12px;
         }
+
         button.secondary {
             background: #2a2a2a;
             color: #e0e0e0;
         }
+
         .work-item {
             background: #1e1e1e;
             padding: 16px;
@@ -363,11 +437,13 @@
             margin-bottom: 16px;
             border-left: 4px solid #f5b042;
         }
+
         .work-actions {
             margin-top: 12px;
             display: flex;
             gap: 12px;
         }
+
         .export-code {
             background: #1e1e1e;
             padding: 16px;
@@ -379,23 +455,7 @@
             overflow: auto;
             margin: 16px 0;
         }
-        .modal-video-container {
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            background: #000;
-            border-radius: 20px;
-            overflow: hidden;
-        }
-        .modal-video-container iframe,
-        .modal-video-container video {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: 0;
-        }
+
         footer {
             text-align: center;
             margin-top: 80px;
@@ -404,6 +464,7 @@
             color: #666;
             border-top: 1px solid #222;
         }
+
         .admin-login-btn, .admin-btn {
             position: fixed;
             bottom: 32px;
@@ -422,12 +483,30 @@
             border: none;
             font-size: 24px;
         }
+
         @media (max-width: 768px) {
-            .container { padding: 0 24px; }
-            .hero { flex-direction: column; text-align: center; gap: 32px; }
-            .hero-tag { border-left: none; padding-left: 0; }
-            .contact-bar { justify-content: center; }
-            .hero h1 { font-size: 2.5rem; }
+            .container {
+                padding: 0 24px;
+            }
+
+            .hero {
+                flex-direction: column;
+                text-align: center;
+                gap: 32px;
+            }
+
+            .hero-tag {
+                border-left: none;
+                padding-left: 0;
+            }
+
+            .contact-bar {
+                justify-content: center;
+            }
+
+            .hero h1 {
+                font-size: 2.2rem;
+            }
         }
     </style>
 </head>
@@ -524,7 +603,7 @@
     </div>
 </div>
 
-<!-- 作品编辑模态框（仅嵌入代码） -->
+<!-- 作品编辑模态框 -->
 <div id="workEditorModal" class="modal">
     <div class="modal-content" style="max-width: 700px;">
         <div class="modal-header">
@@ -570,15 +649,15 @@
     </div>
 </div>
 
-<!-- 视频播放模态框（用于点击卡片后弹窗播放） -->
+<!-- 视频播放模态框（点击卡片后弹出） -->
 <div id="videoModal" class="modal">
-    <div class="modal-content" style="max-width: 1000px;">
+    <div class="modal-content">
         <div class="modal-header">
             <h3 id="modalVideoTitle">视频标题</h3>
             <button class="close-modal-btn" id="closeVideoModalBtn">&times;</button>
         </div>
         <div class="modal-video-container" id="modalVideoContainer"></div>
-        <div class="modal-description" id="modalVideoDesc" style="padding:16px 8px 0; color:#ccc;"></div>
+        <div class="modal-description" id="modalVideoDesc"></div>
     </div>
 </div>
 
@@ -622,17 +701,14 @@
         "纪录片", "电视节目", "短视频", "aigc视频"
     ];
 
-    // 默认数据（与之前相同，但 works 中只使用 embedCode）
+    // 默认数据（与之前保持一致）
     const DEFAULT_DATA = {
         name: "杨崧雨",
         bio: "拥有9年商业视频后期制作经验，精通从创意到成品的全流程制作。性格沉稳，逻辑性强，善于在复杂的项目需求中理清剪辑思路，把控叙事结构。擅长通过剪辑节奏传递情绪、调色塑造质感、混音增强沉浸感，作品横跨TVC广告、纪录片、宣传片、电视栏目、短视频及AIGC视频领域。具备优秀的沟通与对接能力，能够精准理解导演与甲方的核心诉求，高效推进修改意见落地，确保创作意图与商业需求平衡。同时具备团队管理经验，曾统筹多人协作项目，把控进度与质量标准，能够独立完成高品质商业成片，也能带领团队高效交付。",
         contact: "📞 13436664086\n📧 920963242@qq.com\n📍 北京 · 30岁",
         skills: "Final Cut Pro X, Premiere Pro, DaVinci Resolve, After Effects, Runway, 即梦, Pika, 可灵, Midjourney, Stable Diffusion, Topaz, AI配音/AI配乐",
         works: [
-            { id: "1", title: "中国中车微电影《废材的逆袭》", category: "微电影", description: "独立完成剪辑、混音、调色及现场制片统筹。该作品在国资委微电影大赛中荣获微电影单元一等奖。", embedCode: '<iframe src="https://player.youku.com/embed/示例请替换" frameborder="0" allowfullscreen></iframe>', cover: null },
-            { id: "2", title: "CCTV-12《绿水青山的中国》", category: "电视节目", description: "担任后期统筹，带领20人剪辑团队，对接央视审核，把控质量与周期。", embedCode: '<iframe src="https://player.youku.com/embed/示例请替换" frameborder="0" allowfullscreen></iframe>', cover: null },
-            { id: "3", title: "董宇辉×新华社《向新而行》宁夏篇", category: "宣传片", description: "参与后期剪辑，配合调性完成叙事呈现。", embedCode: '<iframe src="https://player.youku.com/embed/示例请替换" frameborder="0" allowfullscreen></iframe>', cover: null },
-            { id: "4", title: "虚拟数字人「天妤TianYu」", category: "短视频", description: "内容策划+后期负责人，3个月粉丝200万，全网500万+。", embedCode: '<iframe src="https://player.youku.com/embed/示例请替换" frameborder="0" allowfullscreen></iframe>', cover: null }
+            { id: "1", title: "示例作品", category: "短视频", description: "请在后台上传新片场嵌入代码", embedCode: "", cover: null }
         ],
         avatar: null
     };
@@ -642,7 +718,7 @@
     let currentEditingWorkIndex = null;
     let cropper = null;
 
-    // 提示功能
+    // Toast 提示
     function showToast(message, duration = 3000) {
         const toast = document.createElement('div');
         toast.innerText = message;
@@ -661,6 +737,7 @@
         setTimeout(() => toast.remove(), duration);
     }
 
+    // 数据读写
     function loadData() {
         const saved = localStorage.getItem("portfolioData");
         if (saved) {
@@ -692,6 +769,17 @@
         }
     }
 
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    // 前端渲染
     function renderFrontend() {
         document.getElementById("displayName").innerText = appData.name;
         document.getElementById("displayBio").innerHTML = appData.bio.replace(/\n/g, '<br>');
@@ -746,7 +834,8 @@
         grid.innerHTML = filtered.map(work => `
             <div class="work-card" data-work-id="${work.id}">
                 <div class="media-container">
-                    ${work.embedCode && work.embedCode.trim() !== '' ? work.embedCode : (work.cover ? `<img src="${work.cover}" alt="封面">` : '<div style="background:#1a1a1a; height:100%; display:flex; align-items:center; justify-content:center;">无视频</div>')}
+                    ${work.cover ? `<img src="${work.cover}" alt="封面">` : `<div style="position:absolute; top:0; left:0; width:100%; height:100%; background:#1a1a1a; display:flex; align-items:center; justify-content:center;">无封面</div>`}
+                    <div class="play-icon">▶</div>
                 </div>
                 <div class="work-info">
                     <div class="work-title">${escapeHtml(work.title)}</div>
@@ -757,15 +846,14 @@
         `).join('');
 
         document.querySelectorAll('.work-card').forEach(card => {
-            card.addEventListener('click', (e) => {
-                const workId = card.dataset.workId;
-                const work = appData.works.find(w => w.id === workId);
+            card.addEventListener('click', () => {
+                const work = appData.works.find(w => w.id === card.dataset.workId);
                 if (work) openVideoModal(work);
             });
         });
     }
 
-    // 弹窗播放视频 (支持 iframe 嵌入)
+    // 弹窗播放视频（不自动播放）
     function openVideoModal(work) {
         const modal = document.getElementById('videoModal');
         const titleElem = document.getElementById('modalVideoTitle');
@@ -776,44 +864,29 @@
         container.innerHTML = '';
 
         if (work.embedCode && work.embedCode.trim() !== '') {
-            // 创建 iframe 播放视频
             const iframe = document.createElement('iframe');
             // 提取 src，处理可能缺少协议的情况
             let srcMatch = work.embedCode.match(/src="([^"]+)"/);
             let src = srcMatch ? srcMatch[1] : '';
-            if (src.startsWith('//')) {
-                src = 'https:' + src;
-            }
+            if (src.startsWith('//')) src = 'https:' + src;
+            // 移除可能存在的 autoplay 参数，确保不自动播放
+            src = src.replace(/[?&]autoplay=1/, '').replace(/[?&]autoplay=0/, '');
+            if (!src.includes('?')) src += '?autoplay=0';
+            else src += '&autoplay=0';
             iframe.src = src;
+            iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen";
             iframe.allowFullscreen = true;
             iframe.style.width = '100%';
             iframe.style.height = '100%';
             iframe.style.border = '0';
             container.appendChild(iframe);
-        } else if (work.cover) {
-            const img = document.createElement('img');
-            img.src = work.cover;
-            img.style.width = '100%';
-            img.style.height = '100%';
-            img.style.objectFit = 'contain';
-            container.appendChild(img);
         } else {
-            container.innerHTML = '<div style="display:flex; align-items:center; justify-content:center; height:100%;">无法播放</div>';
+            container.innerHTML = '<div style="display:flex; align-items:center; justify-content:center; height:100%; color:#aaa;">未配置嵌入代码</div>';
         }
         modal.style.display = 'flex';
     }
 
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
-    }
-
-    // 管理员界面
+    // 管理员界面函数
     function renderAdminButton() {
         const container = document.getElementById("adminControl");
         if (isAdmin) {
@@ -1011,7 +1084,7 @@
         showCropModal(file);
     }
 
-    // 导出数据
+    // 导出数据功能
     function showExportModal() {
         const exportData = {
             name: appData.name,
