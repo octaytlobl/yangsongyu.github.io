@@ -885,19 +885,26 @@
     }
 
     function openVideoModal(work) {
-        const modal = document.getElementById('videoModal');
-        const titleElem = document.getElementById('modalVideoTitle');
-        const descElem = document.getElementById('modalVideoDesc');
-        const container = document.getElementById('modalVideoContainer');
-        titleElem.innerText = work.title;
-        descElem.innerText = work.description;
-        container.innerHTML = '';
-        if (work.embedCode && work.embedCode.trim()) {
+    const modal = document.getElementById('videoModal');
+    const titleElem = document.getElementById('modalVideoTitle');
+    const descElem = document.getElementById('modalVideoDesc');
+    const container = document.getElementById('modalVideoContainer');
+    titleElem.innerText = work.title;
+    descElem.innerText = work.description;
+    container.innerHTML = '';
+
+    if (work.embedCode && work.embedCode.trim() !== '') {
+        // 直接从 embedCode 字符串解析视频URL
+        const parser = new DOMParser();
+        const iframeDoc = parser.parseFromString(work.embedCode, 'text/html');
+        const iframeSrc = iframeDoc.querySelector('iframe')?.src;
+
+        if (iframeSrc) {
             const iframe = document.createElement('iframe');
-            let srcMatch = work.embedCode.match(/src="([^"]+)"/);
-            let src = srcMatch ? srcMatch[1] : '';
+            // 构建最终链接，确保不自动播放，并允许全屏
+            let src = iframeSrc;
             if (src.startsWith('//')) src = 'https:' + src;
-            // 移除自动播放参数
+            // 移除可能存在的 autoplay 参数
             src = src.replace(/[?&]autoplay=1/, '').replace(/[?&]autoplay=0/, '');
             if (!src.includes('?')) src += '?autoplay=0';
             else src += '&autoplay=0';
@@ -909,10 +916,15 @@
             iframe.style.border = '0';
             container.appendChild(iframe);
         } else {
-            container.innerHTML = '<div style="display:flex; align-items:center; justify-content:center; height:100%; color:#aaa;">未配置嵌入代码</div>';
+            // 如果解析不到链接，在控制台输出错误信息
+            console.error("未能从embedCode中解析到视频链接:", work.embedCode);
+            container.innerHTML = '<div>未能从嵌入代码中解析出视频链接，请检查代码格式。</div>';
         }
-        modal.style.display = 'flex';
+    } else {
+        container.innerHTML = '<div style="display:flex; align-items:center; justify-content:center; height:100%; color:#aaa;">未配置嵌入代码</div>';
     }
+    modal.style.display = 'flex';
+}
 
     // 管理员后台逻辑
     function renderAdminButton() {
