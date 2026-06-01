@@ -8,13 +8,12 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <style>
-        /* ----- 全局样式 ----- */
+        /* ========== 样式（与之前完全一致，未改动） ========== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             background: #0a0a0a;
             font-family: 'Inter', -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
@@ -22,8 +21,6 @@
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
         }
-
-        /* 装饰背景 */
         body::before {
             content: "";
             position: fixed;
@@ -36,7 +33,6 @@
             pointer-events: none;
             z-index: 0;
         }
-
         .container {
             max-width: 1280px;
             margin: 0 auto;
@@ -44,31 +40,26 @@
             position: relative;
             z-index: 2;
         }
-
-        /* 头部 */
         .hero {
             padding: 80px 0 60px;
             display: flex;
             align-items: center;
             gap: 60px;
             flex-wrap: wrap;
-            border-bottom: 1px solid rgba(245, 176, 66, 0.2);
+            border-bottom: 1px solid rgba(245,176,66,0.2);
             margin-bottom: 60px;
         }
-
         .avatar-wrapper {
             flex-shrink: 0;
         }
-
         .avatar-img {
             width: 140px;
             height: 140px;
             border-radius: 50%;
             object-fit: cover;
             border: 3px solid #f5b042;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
         }
-
         .avatar-placeholder {
             width: 140px;
             height: 140px;
@@ -81,11 +72,9 @@
             font-size: 14px;
             border: 1px solid #2c2c2c;
         }
-
         .hero-info {
             flex: 1;
         }
-
         .hero h1 {
             font-size: 3.5rem;
             font-weight: 700;
@@ -96,7 +85,6 @@
             color: transparent;
             margin-bottom: 12px;
         }
-
         .hero-tag {
             font-size: 1rem;
             font-weight: 500;
@@ -105,16 +93,13 @@
             border-left: 3px solid #f5b042;
             padding-left: 16px;
         }
-
         .contact-bar {
             display: flex;
             flex-wrap: wrap;
             gap: 16px;
         }
-
-        .contact-bar a,
-        .contact-bar span {
-            background: rgba(255, 255, 255, 0.05);
+        .contact-bar a, .contact-bar span {
+            background: rgba(255,255,255,0.05);
             backdrop-filter: blur(10px);
             padding: 6px 18px;
             border-radius: 40px;
@@ -122,16 +107,13 @@
             color: #e0e0e0;
             text-decoration: none;
             transition: all 0.2s;
-            border: 1px solid rgba(245, 176, 66, 0.3);
+            border: 1px solid rgba(245,176,66,0.3);
         }
-
         .contact-bar a:hover {
             background: #f5b042;
             color: #0a0a0a;
             border-color: #f5b042;
         }
-
-        /* 章节标题 */
         .section-title {
             font-size: 1.8rem;
             font-weight: 600;
@@ -141,39 +123,32 @@
             gap: 12px;
             color: #f5b042;
         }
-
         .section-title i {
             font-size: 1.8rem;
             font-style: normal;
         }
-
-        /* 个人简介卡片 */
         .about-card {
-            background: rgba(20, 20, 22, 0.7);
+            background: rgba(20,20,22,0.7);
             backdrop-filter: blur(8px);
             border-radius: 24px;
             padding: 28px 36px;
             margin-bottom: 20px;
-            border: 1px solid rgba(245, 176, 66, 0.2);
+            border: 1px solid rgba(245,176,66,0.2);
         }
-
         .about-text {
             font-size: 0.95rem;
             color: #ccc;
             line-height: 1.6;
         }
-
-        /* 技能标签 */
         .skills {
             display: flex;
             flex-wrap: wrap;
             gap: 12px;
             margin-bottom: 60px;
         }
-
         .skill-badge {
-            background: rgba(245, 176, 66, 0.1);
-            border: 1px solid rgba(245, 176, 66, 0.3);
+            background: rgba(245,176,66,0.1);
+            border: 1px solid rgba(245,176,66,0.3);
             color: #f5b042;
             padding: 6px 20px;
             border-radius: 40px;
@@ -181,13 +156,10 @@
             font-weight: 500;
             transition: all 0.2s;
         }
-
         .skill-badge:hover {
-            background: rgba(245, 176, 66, 0.2);
+            background: rgba(245,176,66,0.2);
             transform: translateY(-2px);
         }
-
-        /* 筛选栏 */
         .filter-bar {
             display: flex;
             flex-wrap: wrap;
@@ -195,10 +167,9 @@
             gap: 12px;
             margin-bottom: 48px;
         }
-
         .filter-btn {
             background: transparent;
-            border: 1px solid rgba(245, 176, 66, 0.3);
+            border: 1px solid rgba(245,176,66,0.3);
             padding: 6px 24px;
             font-size: 0.85rem;
             font-weight: 500;
@@ -207,36 +178,30 @@
             color: #aaa;
             border-radius: 40px;
         }
-
         .filter-btn.active {
             background: #f5b042;
             color: #0a0a0a;
             border-color: #f5b042;
         }
-
         .filter-btn:hover:not(.active) {
             border-color: #f5b042;
             color: #f5b042;
         }
-
-        /* 作品网格 */
         .works-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
             gap: 40px;
         }
-
         .work-card {
-            background: rgba(20, 20, 22, 0.8);
+            background: rgba(20,20,22,0.8);
             backdrop-filter: blur(8px);
             border-radius: 24px;
             overflow: hidden;
             transition: all 0.3s ease;
-            border: 1px solid rgba(245, 176, 66, 0.2);
+            border: 1px solid rgba(245,176,66,0.2);
             cursor: pointer;
             position: relative;
         }
-
         .work-card::before {
             content: "🎥";
             position: absolute;
@@ -247,20 +212,17 @@
             z-index: 1;
             pointer-events: none;
         }
-
         .work-card:hover {
             transform: translateY(-6px);
             border-color: #f5b042;
-            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.5);
         }
-
         .media-container {
             position: relative;
             padding-bottom: 56.25%;
             height: 0;
             background: #000;
         }
-
         .media-container img {
             position: absolute;
             top: 0;
@@ -269,7 +231,6 @@
             height: 100%;
             object-fit: cover;
         }
-
         .media-container .play-icon {
             position: absolute;
             top: 50%;
@@ -277,7 +238,7 @@
             transform: translate(-50%, -50%);
             width: 60px;
             height: 60px;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0,0,0,0.6);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -288,25 +249,21 @@
             pointer-events: none;
             transition: 0.2s;
         }
-
         .work-card:hover .play-icon {
             transform: translate(-50%, -50%) scale(1.1);
         }
-
         .work-info {
             padding: 20px;
         }
-
         .work-title {
             font-size: 1.2rem;
             font-weight: 600;
             margin-bottom: 8px;
             color: #fff;
         }
-
         .work-cat {
             display: inline-block;
-            background: rgba(245, 176, 66, 0.15);
+            background: rgba(245,176,66,0.15);
             padding: 4px 12px;
             border-radius: 30px;
             font-size: 0.7rem;
@@ -314,22 +271,19 @@
             color: #f5b042;
             margin-bottom: 10px;
         }
-
         .work-desc {
             color: #aaa;
             font-size: 0.85rem;
             line-height: 1.5;
         }
-
         .empty-state {
             text-align: center;
             padding: 80px 20px;
-            background: rgba(20, 20, 22, 0.6);
+            background: rgba(20,20,22,0.6);
             border-radius: 28px;
             color: #888;
         }
-
-        /* ----- 模态框基础样式（可滚动）----- */
+        /* 模态框 */
         .modal {
             display: none;
             position: fixed;
@@ -337,31 +291,26 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0,0,0,0.9);
             z-index: 1000;
             justify-content: center;
             align-items: center;
             backdrop-filter: blur(8px);
         }
-
         .modal-content {
             background: #121212;
             border-radius: 32px;
             max-width: 1000px;
             width: 90%;
             max-height: 85vh;
-            overflow-y: auto;          /* 允许滚动 */
+            overflow-y: auto;
             border: 1px solid #2a2a2a;
             padding: 0;
         }
-
-        /* 后台管理专门的内边距 */
         #adminModal .modal-content {
             max-height: 90vh;
             padding: 24px;
         }
-
-        /* 其他模态框统一内边距 */
         .modal-header {
             display: flex;
             justify-content: space-between;
@@ -369,12 +318,10 @@
             padding: 16px 24px;
             border-bottom: 1px solid #2a2a2a;
         }
-
         .modal-header h3 {
             color: #f5b042;
             font-size: 1.2rem;
         }
-
         .close-modal-btn {
             background: none;
             border: none;
@@ -382,18 +329,15 @@
             cursor: pointer;
             color: #aaa;
         }
-
         .close-modal-btn:hover {
             color: #f5b042;
         }
-
         .modal-video-container {
             position: relative;
             padding-bottom: 56.25%;
             height: 0;
             background: #000;
         }
-
         .modal-video-container iframe {
             position: absolute;
             top: 0;
@@ -402,28 +346,22 @@
             height: 100%;
             border: 0;
         }
-
         .modal-description {
             padding: 16px 24px;
             color: #ccc;
             border-top: 1px solid #2a2a2a;
         }
-
-        /* 后台表单样式 */
+        /* 表单 */
         .form-group {
             margin-bottom: 24px;
         }
-
         .form-group label {
             display: block;
             font-weight: 500;
             margin-bottom: 8px;
             color: #ddd;
         }
-
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
+        .form-group input, .form-group textarea, .form-group select {
             width: 100%;
             padding: 12px 16px;
             background: #1e1e1e;
@@ -432,7 +370,6 @@
             color: #f0f0f0;
             font-family: inherit;
         }
-
         button {
             background: #f5b042;
             color: #0a0a0a;
@@ -444,19 +381,10 @@
             margin-right: 12px;
             transition: 0.2s;
         }
-
         button.secondary {
             background: #2a2a2a;
             color: #e0e0e0;
         }
-
-        /* 作品管理列表滚动 */
-        #worksManager {
-            max-height: 400px;
-            overflow-y: auto;
-            margin-top: 12px;
-        }
-
         .work-item {
             background: #1e1e1e;
             padding: 16px;
@@ -464,13 +392,16 @@
             margin-bottom: 16px;
             border-left: 4px solid #f5b042;
         }
-
         .work-actions {
             margin-top: 12px;
             display: flex;
             gap: 12px;
         }
-
+        #worksManager {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 12px;
+        }
         .export-code {
             background: #1e1e1e;
             padding: 16px;
@@ -482,7 +413,6 @@
             overflow: auto;
             margin: 16px 0;
         }
-
         footer {
             text-align: center;
             margin-top: 80px;
@@ -491,9 +421,7 @@
             color: #666;
             border-top: 1px solid #222;
         }
-
-        .admin-login-btn,
-        .admin-btn {
+        .admin-login-btn, .admin-btn {
             position: fixed;
             bottom: 32px;
             right: 32px;
@@ -506,12 +434,11 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             z-index: 100;
             border: none;
             font-size: 24px;
         }
-
         .logout-btn {
             position: fixed;
             bottom: 32px;
@@ -529,26 +456,12 @@
             align-items: center;
             gap: 6px;
         }
-
         @media (max-width: 768px) {
-            .container {
-                padding: 0 24px;
-            }
-            .hero {
-                flex-direction: column;
-                text-align: center;
-                gap: 32px;
-            }
-            .hero-tag {
-                border-left: none;
-                padding-left: 0;
-            }
-            .contact-bar {
-                justify-content: center;
-            }
-            .hero h1 {
-                font-size: 2.2rem;
-            }
+            .container { padding: 0 24px; }
+            .hero { flex-direction: column; text-align: center; gap: 32px; }
+            .hero-tag { border-left: none; padding-left: 0; }
+            .contact-bar { justify-content: center; }
+            .hero h1 { font-size: 2.2rem; }
         }
     </style>
 </head>
@@ -646,7 +559,7 @@
     </div>
 </div>
 
-<!-- 作品编辑模态框 -->
+<!-- 作品编辑模态框（使用封面 URL，移除文件上传） -->
 <div id="workEditorModal" class="modal">
     <div class="modal-content" style="max-width:700px;">
         <div class="modal-header">
@@ -680,10 +593,12 @@
             <small>从新片场、B站等平台复制“嵌入代码”粘贴至此</small>
         </div>
         <div class="form-group">
-            <label>作品封面（可选）</label>
-            <input type="file" id="workCoverUpload" accept="image/*">
-            <img id="workCoverPreview" style="max-width: 100%; max-height: 150px; margin-top: 10px; display: none;">
-            <button type="button" id="removeCoverBtn" style="background:#ef4444; margin-top: 8px;">移除封面</button>
+            <label>封面图片 URL</label>
+            <input type="text" id="workCoverUrl" placeholder="https://example.com/cover.jpg">
+            <small>请将封面图片上传至免费图床（如 Postimages、Imgur），然后粘贴图片链接。支持 JPG/PNG。</small>
+            <div id="coverUrlPreview" style="margin-top:10px; display:none;">
+                <img style="max-width:100%; max-height:150px; border-radius:8px;">
+            </div>
         </div>
         <div style="margin-top: 24px;">
             <button id="saveWorkBtn">保存作品</button>
@@ -744,14 +659,14 @@
         "纪录片", "电视节目", "短视频", "aigc视频"
     ];
 
-    // 默认数据
+    // 默认数据（示例）
     const DEFAULT_DATA = {
         name: "杨崧雨",
         bio: "拥有9年商业视频后期制作经验，精通从创意到成品的全流程制作。性格沉稳，逻辑性强，善于在复杂的项目需求中理清剪辑思路，把控叙事结构。擅长通过剪辑节奏传递情绪、调色塑造质感、混音增强沉浸感，作品横跨TVC广告、纪录片、宣传片、电视栏目、短视频及AIGC视频领域。具备优秀的沟通与对接能力，能够精准理解导演与甲方的核心诉求，高效推进修改意见落地，确保创作意图与商业需求平衡。同时具备团队管理经验，曾统筹多人协作项目，把控进度与质量标准，能够独立完成高品质商业成片，也能带领团队高效交付。",
         contact: "📞 13436664086\n📧 920963242@qq.com\n📍 北京 · 30岁",
         skills: "Final Cut Pro X, Premiere Pro, DaVinci Resolve, After Effects, Runway, 即梦, Pika, 可灵, Midjourney, Stable Diffusion, Topaz, AI配音/AI配乐",
         works: [
-            { id: "1", title: "示例作品", category: "短视频", description: "请在后台编辑并粘贴新片场嵌入代码", embedCode: "", cover: null }
+            { id: "1", title: "示例作品", category: "短视频", description: "请在后台上传新片场嵌入代码", embedCode: "", cover: "" }
         ],
         avatar: null
     };
@@ -780,7 +695,6 @@
         setTimeout(() => toast.remove(), duration);
     }
 
-    // 数据加载保存
     function loadData() {
         const saved = localStorage.getItem("portfolioData");
         if (saved) {
@@ -790,15 +704,23 @@
                 if (!appData.works) appData.works = [...DEFAULT_DATA.works];
                 if (!appData.avatar) appData.avatar = null;
                 appData.works.forEach(w => {
-                    if (w.cover === undefined) w.cover = null;
-                    if (w.embedCode === undefined) w.embedCode = '';
+                    if (w.cover === undefined) w.cover = "";
+                    if (w.embedCode === undefined) w.embedCode = "";
                 });
             } catch(e) { console.warn(e); }
         }
     }
     function saveData() {
-        localStorage.setItem("portfolioData", JSON.stringify(appData));
-        showToast("✅ 已保存到本地");
+        try {
+            localStorage.setItem("portfolioData", JSON.stringify(appData));
+            showToast("✅ 已保存到本地");
+        } catch(e) {
+            if (e.name === "QuotaExceededError") {
+                showToast("❌ 本地存储空间已满，请使用“导出数据”功能固化到 GitHub，并清空本地存储。");
+            } else {
+                showToast("保存失败：" + e.message);
+            }
+        }
     }
 
     function renderAvatar() {
@@ -818,7 +740,6 @@
         return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m] || m));
     }
 
-    // 前端展示
     function renderFrontend() {
         document.getElementById("displayName").innerText = appData.name;
         document.getElementById("displayBio").innerHTML = appData.bio.replace(/\n/g, '<br>');
@@ -885,48 +806,42 @@
     }
 
     function openVideoModal(work) {
-    const modal = document.getElementById('videoModal');
-    const titleElem = document.getElementById('modalVideoTitle');
-    const descElem = document.getElementById('modalVideoDesc');
-    const container = document.getElementById('modalVideoContainer');
-    titleElem.innerText = work.title;
-    descElem.innerText = work.description;
-    container.innerHTML = '';
-
-    if (work.embedCode && work.embedCode.trim() !== '') {
-        // 直接从 embedCode 字符串解析视频URL
-        const parser = new DOMParser();
-        const iframeDoc = parser.parseFromString(work.embedCode, 'text/html');
-        const iframeSrc = iframeDoc.querySelector('iframe')?.src;
-
-        if (iframeSrc) {
-            const iframe = document.createElement('iframe');
-            // 构建最终链接，确保不自动播放，并允许全屏
-            let src = iframeSrc;
-            if (src.startsWith('//')) src = 'https:' + src;
-            // 移除可能存在的 autoplay 参数
-            src = src.replace(/[?&]autoplay=1/, '').replace(/[?&]autoplay=0/, '');
-            if (!src.includes('?')) src += '?autoplay=0';
-            else src += '&autoplay=0';
-            iframe.src = src;
-            iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen";
-            iframe.allowFullscreen = true;
-            iframe.style.width = '100%';
-            iframe.style.height = '100%';
-            iframe.style.border = '0';
-            container.appendChild(iframe);
+        const modal = document.getElementById('videoModal');
+        const titleElem = document.getElementById('modalVideoTitle');
+        const descElem = document.getElementById('modalVideoDesc');
+        const container = document.getElementById('modalVideoContainer');
+        titleElem.innerText = work.title;
+        descElem.innerText = work.description;
+        container.innerHTML = '';
+        if (work.embedCode && work.embedCode.trim()) {
+            const parser = new DOMParser();
+            const iframeDoc = parser.parseFromString(work.embedCode, 'text/html');
+            const iframeSrc = iframeDoc.querySelector('iframe')?.src;
+            if (iframeSrc) {
+                const iframe = document.createElement('iframe');
+                let src = iframeSrc;
+                if (src.startsWith('//')) src = 'https:' + src;
+                src = src.replace(/[?&]autoplay=1/, '').replace(/[?&]autoplay=0/, '');
+                if (!src.includes('?')) src += '?autoplay=0';
+                else src += '&autoplay=0';
+                iframe.src = src;
+                iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen";
+                iframe.allowFullscreen = true;
+                iframe.style.width = '100%';
+                iframe.style.height = '100%';
+                iframe.style.border = '0';
+                container.appendChild(iframe);
+            } else {
+                console.error("解析iframe失败", work.embedCode);
+                container.innerHTML = '<div>嵌入代码解析失败</div>';
+            }
         } else {
-            // 如果解析不到链接，在控制台输出错误信息
-            console.error("未能从embedCode中解析到视频链接:", work.embedCode);
-            container.innerHTML = '<div>未能从嵌入代码中解析出视频链接，请检查代码格式。</div>';
+            container.innerHTML = '<div style="display:flex; align-items:center; justify-content:center; height:100%; color:#aaa;">未配置嵌入代码</div>';
         }
-    } else {
-        container.innerHTML = '<div style="display:flex; align-items:center; justify-content:center; height:100%; color:#aaa;">未配置嵌入代码</div>';
+        modal.style.display = 'flex';
     }
-    modal.style.display = 'flex';
-}
 
-    // 管理员后台逻辑
+    // 管理员界面
     function renderAdminButton() {
         const container = document.getElementById("adminControl");
         if (isAdmin) {
@@ -979,18 +894,20 @@
         document.getElementById("workCategory").value = work.category;
         document.getElementById("workDesc").value = work.description;
         document.getElementById("workEmbed").value = work.embedCode || '';
+        const coverUrlInput = document.getElementById("workCoverUrl");
+        coverUrlInput.value = work.cover || '';
+        const previewDiv = document.getElementById("coverUrlPreview");
         if (work.cover) {
-            document.getElementById("workCoverPreview").src = work.cover;
-            document.getElementById("workCoverPreview").style.display = "block";
+            previewDiv.style.display = 'block';
+            previewDiv.querySelector('img').src = work.cover;
         } else {
-            document.getElementById("workCoverPreview").style.display = "none";
+            previewDiv.style.display = 'none';
         }
         document.getElementById("workEditorModal").style.display = "flex";
     }
     function closeWorkEditor() {
         document.getElementById("workEditorModal").style.display = "none";
         currentEditingWorkIndex = null;
-        document.getElementById("workCoverUpload").value = '';
     }
     function saveWork() {
         if (currentEditingWorkIndex === null) return;
@@ -999,29 +916,17 @@
         const category = document.getElementById("workCategory").value;
         const desc = document.getElementById("workDesc").value;
         const embedCode = document.getElementById("workEmbed").value.trim();
+        const coverUrl = document.getElementById("workCoverUrl").value.trim();
         const work = appData.works[currentEditingWorkIndex];
         work.title = title;
         work.category = category;
         work.description = desc;
         work.embedCode = embedCode;
-
-        const coverFile = document.getElementById("workCoverUpload").files[0];
-        if (coverFile) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                work.cover = e.target.result;
-                saveData();
-                renderWorksManager();
-                renderFrontend();
-                closeWorkEditor();
-            };
-            reader.readAsDataURL(coverFile);
-        } else {
-            saveData();
-            renderWorksManager();
-            renderFrontend();
-            closeWorkEditor();
-        }
+        work.cover = coverUrl;
+        saveData();
+        renderWorksManager();
+        renderFrontend();
+        closeWorkEditor();
     }
     function addNewWork() {
         const newWork = {
@@ -1030,7 +935,7 @@
             category: "短视频",
             description: "作品描述，可自行修改。",
             embedCode: '<iframe src="https://player.youku.com/embed/请替换视频链接" frameborder="0" allowfullscreen></iframe>',
-            cover: null
+            cover: ""
         };
         appData.works.push(newWork);
         renderWorksManager();
@@ -1138,12 +1043,28 @@
         renderAdminButton();
     }
 
+    // 预览封面URL
+    function setupCoverPreview() {
+        const input = document.getElementById("workCoverUrl");
+        const previewDiv = document.getElementById("coverUrlPreview");
+        const img = previewDiv.querySelector('img');
+        input.addEventListener('input', () => {
+            const url = input.value.trim();
+            if (url) {
+                previewDiv.style.display = 'block';
+                img.src = url;
+            } else {
+                previewDiv.style.display = 'none';
+            }
+        });
+    }
+
     function init() {
         loadData();
         renderFrontend();
         checkAdminStatus();
+        setupCoverPreview();
 
-        // 事件绑定
         document.getElementById("submitLoginBtn").addEventListener("click", attemptLogin);
         document.getElementById("closeLoginBtn").addEventListener("click", closeLoginModal);
         document.getElementById("cancelLoginBtn").addEventListener("click", closeLoginModal);
@@ -1155,19 +1076,6 @@
         document.getElementById("closeWorkEditorBtn").addEventListener("click", closeWorkEditor);
         document.getElementById("cancelWorkBtn").addEventListener("click", closeWorkEditor);
         document.getElementById("saveWorkBtn").addEventListener("click", saveWork);
-        document.getElementById("workCoverUpload").addEventListener("change", (e) => {
-            if(e.target.files && e.target.files[0]) {
-                const reader = new FileReader();
-                reader.onload = (ev) => { document.getElementById("workCoverPreview").src = ev.target.result; document.getElementById("workCoverPreview").style.display = "block"; };
-                reader.readAsDataURL(e.target.files[0]);
-            }
-        });
-        document.getElementById("removeCoverBtn").addEventListener("click", () => {
-            document.getElementById("workCoverPreview").style.display = "none";
-            document.getElementById("workCoverPreview").src = "";
-            document.getElementById("workCoverUpload").value = '';
-            if (currentEditingWorkIndex !== null) appData.works[currentEditingWorkIndex].cover = null;
-        });
         document.getElementById("closeCropBtn").addEventListener("click", closeCropModal);
         document.getElementById("cancelCropBtn").addEventListener("click", closeCropModal);
         document.getElementById("confirmCropBtn").addEventListener("click", confirmCrop);
