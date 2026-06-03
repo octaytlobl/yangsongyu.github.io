@@ -10,7 +10,7 @@
     <!-- 腾讯云 CloudBase SDK -->
     <script src="https://static.cloudbase.net/cloudbase-js-sdk/2.17.3/cloudbase.full.js"></script>
     <style>
-        /* ---------- 样式（与原版完全一致） ---------- */
+        /* ---------- 完整样式（与原版一致） ---------- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #0a0a0a; font-family: 'Inter', -apple-system, 'SF Pro Text', Helvetica, Arial, sans-serif; color: #e8e8e8; line-height: 1.5; -webkit-font-smoothing: antialiased; }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(rgba(245, 176, 66, 0.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
@@ -245,10 +245,8 @@
 
 <script>
     // ---------- CloudBase 配置 ----------
-    const ENV_ID = 'zhiing666-d1gx2fgv8198fe8b2';   // 已替换为您的环境ID
-    const app = cloudbase.init({
-        env: ENV_ID,
-    });
+    const ENV_ID = 'zhiing666-d1gx2fgv8198fe8b2';
+    const app = cloudbase.init({ env: ENV_ID });
     const db = app.database();
     let isAdmin = false;
     let currentEditingWorkIndex = null;
@@ -261,7 +259,45 @@
         works: [],
         avatar: null
     };
-    let isDataLoaded = false;   // 防止未登录时修改数据
+
+    // 预设个人信息（与之前网站一致）
+    const DEFAULT_PROFILE = {
+        name: "杨崧雨",
+        bio: "拥有9年商业视频后期制作经验，精通从创意到成品的全流程制作。性格沉稳，逻辑性强，善于在复杂的项目需求中理清剪辑思路，把控叙事结构。擅长通过剪辑节奏传递情绪、调色塑造质感、混音增强沉浸感，作品横跨TVC广告、纪录片、宣传片、电视栏目、短视频及AIGC视频领域。具备优秀的沟通与对接能力，能够精准理解导演与甲方的核心诉求，高效推进修改意见落地，确保创作意图与商业需求平衡。同时具备团队管理经验，曾统筹多人协作项目，把控进度与质量标准，能够独立完成高品质商业成片，也能带领团队高效交付。",
+        contact: "📞 13436664086\n📧 920963242@qq.com\n📍 北京 · 30岁",
+        skills: "Final Cut Pro X, Premiere Pro, DaVinci Resolve, After Effects, Runway, 即梦, Pika, 可灵, Midjourney, Stable Diffusion, Topaz, AI配音/AI配乐",
+        avatar: null
+    };
+    const DEFAULT_WORKS = [
+        {
+            title: "中国中车微电影《废材的逆袭》",
+            category: "微电影",
+            description: "独立完成剪辑、混音、调色及现场制片统筹。该作品在国资委微电影大赛中荣获微电影单元一等奖。",
+            embedCode: '<iframe src="https://player.youku.com/embed/示例请替换" frameborder="0" allowfullscreen></iframe>',
+            cover: ""
+        },
+        {
+            title: "CCTV-12《绿水青山的中国》",
+            category: "电视节目",
+            description: "担任后期统筹，带领20人剪辑团队，对接央视审核，把控质量与周期。",
+            embedCode: '<iframe src="https://player.youku.com/embed/示例请替换" frameborder="0" allowfullscreen></iframe>',
+            cover: ""
+        },
+        {
+            title: "董宇辉×新华社《向新而行》宁夏篇",
+            category: "宣传片",
+            description: "参与后期剪辑，配合调性完成叙事呈现。",
+            embedCode: '<iframe src="https://player.youku.com/embed/示例请替换" frameborder="0" allowfullscreen></iframe>',
+            cover: ""
+        },
+        {
+            title: "虚拟数字人「天妤TianYu」",
+            category: "短视频",
+            description: "内容策划+后期负责人，3个月粉丝200万，全网500万+。",
+            embedCode: '<iframe src="https://player.youku.com/embed/示例请替换" frameborder="0" allowfullscreen></iframe>',
+            cover: ""
+        }
+    ];
 
     // ---------- 辅助函数 ----------
     function showToast(message, duration = 3000) {
@@ -281,30 +317,21 @@
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), duration);
     }
-
     function escapeHtml(str) {
         if (!str) return '';
         return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m] || m));
     }
 
-    // 匿名登录 CloudBase
+    // 匿名登录
     async function ensureLogin() {
         const auth = app.auth();
         try {
             const loginState = await auth.getLoginState();
-            if (!loginState) {
-                await auth.signInAnonymously();
-                console.log('匿名登录成功');
-            } else {
-                console.log('已登录');
-            }
-        } catch (err) {
-            console.error('登录失败', err);
-            showToast('云服务连接失败，请检查网络', 5000);
-        }
+            if (!loginState) await auth.signInAnonymously();
+        } catch (err) { console.error('登录失败', err); }
     }
 
-    // 加载个人资料
+    // 加载个人信息（若没有则自动创建预设内容）
     async function loadProfile() {
         try {
             const res = await db.collection('profile').get();
@@ -316,51 +343,32 @@
                 appData.skills = p.skills || '';
                 appData.avatar = p.avatar || null;
             } else {
-                // 默认数据
-                const defaultProfile = {
-                    name: "杨崧雨",
-                    bio: "拥有9年商业视频后期制作经验，精通从创意到成品的全流程制作。性格沉稳，逻辑性强，善于在复杂的项目需求中理清剪辑思路，把控叙事结构。擅长通过剪辑节奏传递情绪、调色塑造质感、混音增强沉浸感，作品横跨TVC广告、纪录片、宣传片、电视栏目、短视频及AIGC视频领域。具备优秀的沟通与对接能力，能够精准理解导演与甲方的核心诉求，高效推进修改意见落地，确保创作意图与商业需求平衡。同时具备团队管理经验，曾统筹多人协作项目，把控进度与质量标准，能够独立完成高品质商业成片，也能带领团队高效交付。",
-                    contact: "📞 13436664086\n📧 920963242@qq.com\n📍 北京 · 30岁",
-                    skills: "Final Cut Pro X, Premiere Pro, DaVinci Resolve, After Effects, Runway, 即梦, Pika, 可灵, Midjourney, Stable Diffusion, Topaz, AI配音/AI配乐",
-                    avatar: null
-                };
-                await db.collection('profile').add(defaultProfile);
-                Object.assign(appData, defaultProfile);
+                await db.collection('profile').add(DEFAULT_PROFILE);
+                Object.assign(appData, DEFAULT_PROFILE);
             }
-        } catch (err) {
-            console.error('加载个人资料失败', err);
-            showToast('加载个人信息失败');
-        }
+        } catch (err) { console.error(err); }
     }
 
-    // 加载作品列表
+    // 加载作品列表（若没有则自动创建预设作品）
     async function loadWorks() {
         try {
             const res = await db.collection('works').get();
-            appData.works = res.data || [];
-            if (appData.works.length === 0) {
-                // 添加一个示例作品
-                const sample = {
-                    title: "示例作品",
-                    category: "短视频",
-                    description: "请在后台编辑并粘贴新片场嵌入代码",
-                    embedCode: "",
-                    cover: ""
-                };
-                const addRes = await db.collection('works').add(sample);
-                appData.works.push({ ...sample, _id: addRes.id });
+            if (res.data && res.data.length > 0) {
+                appData.works = res.data;
+            } else {
+                for (const w of DEFAULT_WORKS) {
+                    await db.collection('works').add(w);
+                }
+                const newRes = await db.collection('works').get();
+                appData.works = newRes.data || [];
             }
-        } catch (err) {
-            console.error('加载作品失败', err);
-            showToast('加载作品失败');
-        }
+        } catch (err) { console.error(err); }
     }
 
-    // 保存个人资料（仅管理员可写）
+    // 保存个人信息（仅管理员）
     async function saveProfileToCloud(profile) {
         if (!isAdmin) return false;
         try {
-            // 获取已有记录 id
             const res = await db.collection('profile').get();
             if (res.data && res.data.length > 0) {
                 const id = res.data[0]._id;
@@ -369,19 +377,14 @@
                 await db.collection('profile').add(profile);
             }
             return true;
-        } catch (err) {
-            console.error('保存个人信息失败', err);
-            showToast('保存个人信息失败');
-            return false;
-        }
+        } catch (err) { return false; }
     }
-
-    // 保存作品（新增或更新）
+    // 保存作品
     async function saveWorkToCloud(work, isNew) {
         if (!isAdmin) return false;
         try {
             if (isNew) {
-                const { id, ...rest } = work; // 移除临时id
+                const { id, ...rest } = work;
                 await db.collection('works').add(rest);
             } else {
                 await db.collection('works').doc(work.id).update({
@@ -393,27 +396,17 @@
                 });
             }
             return true;
-        } catch (err) {
-            console.error('保存作品失败', err);
-            showToast('保存作品失败');
-            return false;
-        }
+        } catch (err) { return false; }
     }
-
-    // 删除作品
     async function deleteWorkFromCloud(workId) {
         if (!isAdmin) return false;
         try {
             await db.collection('works').doc(workId).remove();
             return true;
-        } catch (err) {
-            console.error('删除作品失败', err);
-            showToast('删除作品失败');
-            return false;
-        }
+        } catch (err) { return false; }
     }
 
-    // ---------- 渲染前端界面 ----------
+    // 渲染前端界面
     function renderAvatar() {
         const img = document.getElementById("avatarImg");
         const placeholder = document.getElementById("avatarPlaceholder");
@@ -426,7 +419,6 @@
             placeholder.style.display = "flex";
         }
     }
-
     function renderFrontend() {
         document.getElementById("displayName").innerText = appData.name;
         document.getElementById("displayBio").innerHTML = appData.bio.replace(/\n/g, '<br>');
@@ -441,10 +433,8 @@
             return `<span>${text}</span>`;
         }).join('');
         document.getElementById("displayContact").innerHTML = contactHtml;
-
         const skillList = appData.skills.split(/[ ,，]+/).filter(s => s.trim());
         document.getElementById("displaySkills").innerHTML = skillList.map(s => `<span class="skill-badge">${escapeHtml(s.trim())}</span>`).join('');
-
         const filterBar = document.getElementById("filterBar");
         filterBar.innerHTML = `<button class="filter-btn active" data-cat="all">全部</button>` +
             CATEGORIES.map(cat => `<button class="filter-btn" data-cat="${cat}">${cat}</button>`).join('');
@@ -452,12 +442,7 @@
         renderWorks('all');
         renderAvatar();
     }
-
-    const CATEGORIES = [
-        "tvc广告", "宣传片", "预告片", "微电影",
-        "纪录片", "电视节目", "短视频", "aigc视频"
-    ];
-
+    const CATEGORIES = ["tvc广告","宣传片","预告片","微电影","纪录片","电视节目","短视频","aigc视频"];
     function attachFilterEvents() {
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.removeEventListener('click', filterHandler);
@@ -497,7 +482,6 @@
             });
         });
     }
-
     function openVideoModal(work) {
         const modal = document.getElementById('videoModal');
         const titleElem = document.getElementById('modalVideoTitle');
@@ -524,16 +508,12 @@
                 iframe.style.height = '100%';
                 iframe.style.border = '0';
                 container.appendChild(iframe);
-            } else {
-                container.innerHTML = '<div>嵌入代码解析失败</div>';
-            }
-        } else {
-            container.innerHTML = '<div style="display:flex; align-items:center; justify-content:center; height:100%; color:#aaa;">未配置嵌入代码</div>';
-        }
+            } else container.innerHTML = '<div>嵌入代码解析失败</div>';
+        } else container.innerHTML = '<div style="display:flex; align-items:center; justify-content:center; height:100%; color:#aaa;">未配置嵌入代码</div>';
         modal.style.display = 'flex';
     }
 
-    // ---------- 管理员界面 ----------
+    // 管理员界面
     function renderAdminButton() {
         const container = document.getElementById("adminControl");
         if (isAdmin) {
@@ -541,48 +521,33 @@
             document.getElementById("openAdminBtn").addEventListener("click", openAdminModal);
         } else {
             container.innerHTML = `<button class="admin-login-btn" id="showLoginBtn">🔐</button>`;
-            document.getElementById("showLoginBtn").addEventListener("click", () => {
-                document.getElementById("loginModal").style.display = "flex";
-            });
+            document.getElementById("showLoginBtn").addEventListener("click", () => document.getElementById("loginModal").style.display = "flex");
         }
     }
-
     function renderWorksManager() {
         const container = document.getElementById("worksManager");
-        if (!appData.works) appData.works = [];
         container.innerHTML = appData.works.map((work, idx) => `
             <div class="work-item" data-idx="${idx}">
                 <div><strong>${escapeHtml(work.title)}</strong> (${work.category})</div>
-                <div style="font-size:0.85rem;">${escapeHtml(work.description.substring(0, 80))}</div>
+                <div style="font-size:0.85rem;">${escapeHtml(work.description.substring(0,80))}</div>
                 <div class="work-actions">
                     <button type="button" class="edit-work" data-idx="${idx}">编辑</button>
                     <button type="button" class="delete-work" data-idx="${idx}" style="background:#ef4444;">删除</button>
                 </div>
             </div>
         `).join('');
-        if (appData.works.length === 0) container.innerHTML = '<p>暂无作品，点击添加</p>';
-        document.querySelectorAll('.edit-work').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const idx = parseInt(btn.dataset.idx);
-                openWorkEditor(idx);
-            });
-        });
-        document.querySelectorAll('.delete-work').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                const idx = parseInt(btn.dataset.idx);
-                if (confirm('删除该作品？')) {
-                    const work = appData.works[idx];
-                    const success = await deleteWorkFromCloud(work._id);
-                    if (success) {
-                        await loadWorks();   // 重新拉取
-                        renderWorksManager();
-                        renderFrontend();
-                    }
-                }
-            });
-        });
+        if (!appData.works.length) container.innerHTML = '<p>暂无作品，点击添加</p>';
+        document.querySelectorAll('.edit-work').forEach(btn => btn.addEventListener('click', (e) => openWorkEditor(parseInt(btn.dataset.idx))));
+        document.querySelectorAll('.delete-work').forEach(btn => btn.addEventListener('click', async (e) => {
+            const idx = parseInt(btn.dataset.idx);
+            if (confirm('删除该作品？')) {
+                await deleteWorkFromCloud(appData.works[idx]._id);
+                await loadWorks();
+                renderWorksManager();
+                renderFrontend();
+            }
+        }));
     }
-
     function openWorkEditor(idx) {
         const work = appData.works[idx];
         if (!work) return;
@@ -596,17 +561,13 @@
         if (work.cover) {
             previewDiv.style.display = 'block';
             previewDiv.querySelector('img').src = work.cover;
-        } else {
-            previewDiv.style.display = 'none';
-        }
+        } else previewDiv.style.display = 'none';
         document.getElementById("workEditorModal").style.display = "flex";
     }
-
     function closeWorkEditor() {
         document.getElementById("workEditorModal").style.display = "none";
         currentEditingWorkIndex = null;
     }
-
     async function saveWork() {
         if (currentEditingWorkIndex === null) return;
         const title = document.getElementById("workTitle").value.trim();
@@ -616,7 +577,7 @@
         const embedCode = document.getElementById("workEmbed").value.trim();
         const coverUrl = document.getElementById("workCoverUrl").value.trim();
         const work = appData.works[currentEditingWorkIndex];
-        const isNew = !work._id;  // 正常情况下都有_id，但以防万一
+        const isNew = !work._id;
         const success = await saveWorkToCloud({
             id: work._id,
             title, category, description: desc, embedCode, cover: coverUrl
@@ -628,58 +589,46 @@
             closeWorkEditor();
         }
     }
-
     async function addNewWork() {
-        const success = await saveWorkToCloud({
+        await saveWorkToCloud({
             title: "新作品标题",
             category: "短视频",
             description: "作品描述，可自行修改。",
             embedCode: '<iframe src="https://player.youku.com/embed/请替换视频链接" frameborder="0" allowfullscreen></iframe>',
             cover: ""
         }, true);
-        if (success) {
-            await loadWorks();
-            renderWorksManager();
-            renderFrontend();
-            // 打开最后新增的作品进行编辑
-            if (appData.works.length > 0) {
-                openWorkEditor(appData.works.length - 1);
-            }
-        }
+        await loadWorks();
+        renderWorksManager();
+        renderFrontend();
+        if (appData.works.length) openWorkEditor(appData.works.length-1);
     }
-
-    // 头像裁剪相关
+    // 头像裁剪
     function showCropModal(file) {
         const img = document.getElementById("cropImage");
         const url = URL.createObjectURL(file);
         img.src = url;
         document.getElementById("cropModal").style.display = "flex";
         if (cropper) cropper.destroy();
-        cropper = new Cropper(img, { aspectRatio: 1, viewMode: 1, dragMode: 'move', cropBoxMovable: true, cropBoxResizable: true });
+        cropper = new Cropper(img, { aspectRatio:1, viewMode:1, dragMode:'move', cropBoxMovable:true, cropBoxResizable:true });
     }
     function confirmCrop() {
         if (!cropper) return;
         const canvas = cropper.getCroppedCanvas();
-        const base64 = canvas.toDataURL('image/jpeg', 0.9);
+        const base64 = canvas.toDataURL('image/jpeg',0.9);
         appData.avatar = base64;
-        if (isAdmin) {
-            saveProfileToCloud({ avatar: base64 });
-        } else {
-            showToast("请先登录管理员再保存头像");
-        }
+        if (isAdmin) saveProfileToCloud({ avatar: base64 });
+        else showToast("请先登录管理员再保存头像");
         closeCropModal();
         renderAvatar();
         const previewImg = document.getElementById("adminAvatarPreview");
         const previewPlaceholder = document.getElementById("adminAvatarPlaceholder");
-        previewImg.src = base64;
-        previewImg.style.display = "block";
+        previewImg.src = base64; previewImg.style.display = "block";
         previewPlaceholder.style.display = "none";
     }
     function closeCropModal() {
         document.getElementById("cropModal").style.display = "none";
         if (cropper) { cropper.destroy(); cropper = null; }
     }
-
     function openAdminModal() {
         document.getElementById("editName").value = appData.name;
         document.getElementById("editBio").value = appData.bio;
@@ -712,19 +661,15 @@
         closeAdminModal();
     }
     function handleAvatarUpload(file) { if (file) showCropModal(file); }
-
-    // 登录退出
     function attemptLogin() {
         const pwd = document.getElementById("adminPassword").value;
         if (pwd === "ysy2025") {
             isAdmin = true;
-            sessionStorage.setItem("admin", "true");
+            sessionStorage.setItem("admin","true");
             closeLoginModal();
             renderAdminButton();
             showToast("管理员模式已开启");
-        } else {
-            showToast("密码错误");
-        }
+        } else showToast("密码错误");
     }
     function logout() {
         isAdmin = false;
@@ -741,7 +686,6 @@
         isAdmin = (sessionStorage.getItem("admin") === "true");
         renderAdminButton();
     }
-
     function setupCoverPreview() {
         const input = document.getElementById("workCoverUrl");
         const previewDiv = document.getElementById("coverUrlPreview");
@@ -752,13 +696,10 @@
             if (url) {
                 previewDiv.style.display = 'block';
                 img.src = url;
-            } else {
-                previewDiv.style.display = 'none';
-            }
+            } else previewDiv.style.display = 'none';
         });
     }
 
-    // 全量初始化
     async function init() {
         await ensureLogin();
         await loadProfile();
@@ -766,8 +707,7 @@
         renderFrontend();
         checkAdminStatus();
         setupCoverPreview();
-
-        // 事件绑定
+        // 绑定事件
         document.getElementById("submitLoginBtn").addEventListener("click", attemptLogin);
         document.getElementById("closeLoginBtn").addEventListener("click", closeLoginModal);
         document.getElementById("cancelLoginBtn").addEventListener("click", closeLoginModal);
@@ -782,10 +722,9 @@
         document.getElementById("closeCropBtn").addEventListener("click", closeCropModal);
         document.getElementById("cancelCropBtn").addEventListener("click", closeCropModal);
         document.getElementById("confirmCropBtn").addEventListener("click", confirmCrop);
-        document.getElementById("closeVideoModalBtn").addEventListener("click", () => { document.getElementById("videoModal").style.display = "none"; });
+        document.getElementById("closeVideoModalBtn").addEventListener("click", () => document.getElementById("videoModal").style.display = "none");
         document.getElementById("logoutBtnInModal").addEventListener("click", logout);
-
-        window.onclick = function(e) {
+        window.onclick = (e) => {
             if (e.target === document.getElementById("loginModal")) closeLoginModal();
             if (e.target === document.getElementById("adminModal")) closeAdminModal();
             if (e.target === document.getElementById("workEditorModal")) closeWorkEditor();
@@ -793,7 +732,6 @@
             if (e.target === document.getElementById("videoModal")) document.getElementById("videoModal").style.display = "none";
         };
     }
-
     init();
 </script>
 </body>
