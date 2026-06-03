@@ -7,10 +7,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-    <!--  Supabase JS 客户端  -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- 腾讯云 CloudBase SDK -->
+    <script src="https://static.cloudbase.net/cloudbase-js-sdk/2.17.3/cloudbase.full.js"></script>
     <style>
-        /* ---------- 样式部分（与之前相同，确保视觉一致） ---------- */
+        /* ---------- 样式（与原版完全一致） ---------- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #0a0a0a; font-family: 'Inter', -apple-system, 'SF Pro Text', Helvetica, Arial, sans-serif; color: #e8e8e8; line-height: 1.5; -webkit-font-smoothing: antialiased; }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(rgba(245, 176, 66, 0.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
@@ -49,7 +49,6 @@
         .work-cat { display: inline-block; background: rgba(245,176,66,0.15); padding: 4px 12px; border-radius: 30px; font-size: 0.7rem; font-weight: 500; color: #f5b042; margin-bottom: 10px; }
         .work-desc { color: #aaa; font-size: 0.85rem; line-height: 1.5; }
         .empty-state { text-align: center; padding: 80px 20px; background: rgba(20,20,22,0.6); border-radius: 28px; color: #888; }
-        /* 模态框样式 */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(8px); }
         .modal-content { background: #121212; border-radius: 32px; max-width: 1000px; width: 90%; max-height: 85vh; overflow-y: auto; border: 1px solid #2a2a2a; padding: 0; }
         #adminModal .modal-content { max-height: 90vh; padding: 24px; }
@@ -60,7 +59,6 @@
         .modal-video-container { position: relative; padding-bottom: 56.25%; height: 0; background: #000; }
         .modal-video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
         .modal-description { padding: 16px 24px; color: #ccc; border-top: 1px solid #2a2a2a; }
-        /* 表单 */
         .form-group { margin-bottom: 24px; }
         .form-group label { display: block; font-weight: 500; margin-bottom: 8px; color: #ddd; }
         .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px 16px; background: #1e1e1e; border: 1px solid #2c2c2c; border-radius: 20px; color: #f0f0f0; font-family: inherit; }
@@ -69,7 +67,6 @@
         .work-item { background: #1e1e1e; padding: 16px; border-radius: 20px; margin-bottom: 16px; border-left: 4px solid #f5b042; }
         .work-actions { margin-top: 12px; display: flex; gap: 12px; }
         #worksManager { max-height: 400px; overflow-y: auto; margin-top: 12px; }
-        .export-code { background: #1e1e1e; padding: 16px; border-radius: 12px; font-family: monospace; font-size: 12px; white-space: pre-wrap; max-height: 300px; overflow: auto; margin: 16px 0; }
         footer { text-align: center; margin-top: 80px; padding: 32px; font-size: 0.8rem; color: #666; border-top: 1px solid #222; }
         .admin-login-btn, .admin-btn { position: fixed; bottom: 32px; right: 32px; background: #f5b042; color: #0a0a0a; width: 54px; height: 54px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 100; border: none; font-size: 24px; }
         .logout-btn { position: fixed; bottom: 32px; right: 100px; background: #444; color: white; width: auto; padding: 0 16px; height: 40px; border-radius: 40px; font-size: 14px; cursor: pointer; z-index: 100; display: flex; align-items: center; gap: 6px; }
@@ -103,7 +100,7 @@
     <div id="worksGrid" class="works-grid"></div>
 </div>
 
-<footer>© 杨崧雨 · 影像叙事者 | 数据存储于云端，管理员可登录更新</footer>
+<footer>© 杨崧雨 · 影像叙事者 | 数据存储于云端，实时同步</footer>
 <div id="adminControl"></div>
 
 <!-- 登录模态框 -->
@@ -247,21 +244,15 @@
 </div>
 
 <script>
-    // ---------- Supabase 配置 ----------
-    // 请替换为您的实际值（在 Supabase 项目设置 -> API 中找到）
-    const SUPABASE_URL = 'YOUR_SUPABASE_URL';      // 例如 https://xxxxx.supabase.co
-    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
-    const SUPABASE_SERVICE_ROLE_KEY = 'YOUR_SUPABASE_SERVICE_ROLE_KEY';  // 从 Project Settings -> API 获取（注意保密）
-
-    // 初始化两个客户端
-    const supabaseAnon = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    let supabaseAdmin = null;  // 仅在管理员登录后初始化
-
-    // ---------- 全局变量 ----------
-    const CATEGORIES = [
-        "tvc广告", "宣传片", "预告片", "微电影",
-        "纪录片", "电视节目", "短视频", "aigc视频"
-    ];
+    // ---------- CloudBase 配置 ----------
+    const ENV_ID = 'zhiing666-d1gx2fgv8198fe8b2';   // 已替换为您的环境ID
+    const app = cloudbase.init({
+        env: ENV_ID,
+    });
+    const db = app.database();
+    let isAdmin = false;
+    let currentEditingWorkIndex = null;
+    let cropper = null;
     let appData = {
         name: "",
         bio: "",
@@ -270,10 +261,7 @@
         works: [],
         avatar: null
     };
-    let isAdmin = false;
-    let currentEditingWorkIndex = null;
-    let cropper = null;
-    let tempAvatarFile = null;
+    let isDataLoaded = false;   // 防止未登录时修改数据
 
     // ---------- 辅助函数 ----------
     function showToast(message, duration = 3000) {
@@ -299,147 +287,133 @@
         return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m] || m));
     }
 
-    // 从数据库加载所有数据
-    async function loadData() {
+    // 匿名登录 CloudBase
+    async function ensureLogin() {
+        const auth = app.auth();
         try {
-            // 加载 profiles 表（只有一行，假设 id=1）
-            const { data: profileData, error: profileError } = await supabaseAnon
-                .from('profiles')
-                .select('*')
-                .limit(1);
-            if (profileError) throw profileError;
-            if (profileData && profileData.length > 0) {
-                const p = profileData[0];
+            const loginState = await auth.getLoginState();
+            if (!loginState) {
+                await auth.signInAnonymously();
+                console.log('匿名登录成功');
+            } else {
+                console.log('已登录');
+            }
+        } catch (err) {
+            console.error('登录失败', err);
+            showToast('云服务连接失败，请检查网络', 5000);
+        }
+    }
+
+    // 加载个人资料
+    async function loadProfile() {
+        try {
+            const res = await db.collection('profile').get();
+            if (res.data && res.data.length > 0) {
+                const p = res.data[0];
                 appData.name = p.name || '';
                 appData.bio = p.bio || '';
                 appData.contact = p.contact || '';
                 appData.skills = p.skills || '';
                 appData.avatar = p.avatar || null;
             } else {
-                // 如果 profiles 表为空，插入默认数据
+                // 默认数据
                 const defaultProfile = {
                     name: "杨崧雨",
-                    bio: "拥有9年商业视频后期制作经验...",
+                    bio: "拥有9年商业视频后期制作经验，精通从创意到成品的全流程制作。性格沉稳，逻辑性强，善于在复杂的项目需求中理清剪辑思路，把控叙事结构。擅长通过剪辑节奏传递情绪、调色塑造质感、混音增强沉浸感，作品横跨TVC广告、纪录片、宣传片、电视栏目、短视频及AIGC视频领域。具备优秀的沟通与对接能力，能够精准理解导演与甲方的核心诉求，高效推进修改意见落地，确保创作意图与商业需求平衡。同时具备团队管理经验，曾统筹多人协作项目，把控进度与质量标准，能够独立完成高品质商业成片，也能带领团队高效交付。",
                     contact: "📞 13436664086\n📧 920963242@qq.com\n📍 北京 · 30岁",
                     skills: "Final Cut Pro X, Premiere Pro, DaVinci Resolve, After Effects, Runway, 即梦, Pika, 可灵, Midjourney, Stable Diffusion, Topaz, AI配音/AI配乐",
                     avatar: null
                 };
-                const { error: insertError } = await supabaseAnon
-                    .from('profiles')
-                    .insert([defaultProfile]);
-                if (insertError) console.error("插入默认profile失败", insertError);
-                else {
-                    appData.name = defaultProfile.name;
-                    appData.bio = defaultProfile.bio;
-                    appData.contact = defaultProfile.contact;
-                    appData.skills = defaultProfile.skills;
-                    appData.avatar = null;
-                }
+                await db.collection('profile').add(defaultProfile);
+                Object.assign(appData, defaultProfile);
             }
-
-            // 加载 works 表
-            const { data: worksData, error: worksError } = await supabaseAnon
-                .from('works')
-                .select('*')
-                .order('createdAt', { ascending: false });
-            if (worksError) throw worksError;
-            appData.works = worksData || [];
-
-            renderFrontend();
         } catch (err) {
-            console.error("加载数据失败", err);
-            showToast("加载数据失败，请检查网络或 Supabase 配置");
+            console.error('加载个人资料失败', err);
+            showToast('加载个人信息失败');
         }
     }
 
-    // 保存个人信息到数据库（需要管理员权限）
-    async function saveProfileToDatabase() {
-        if (!supabaseAdmin) {
-            showToast("请先登录管理员");
+    // 加载作品列表
+    async function loadWorks() {
+        try {
+            const res = await db.collection('works').get();
+            appData.works = res.data || [];
+            if (appData.works.length === 0) {
+                // 添加一个示例作品
+                const sample = {
+                    title: "示例作品",
+                    category: "短视频",
+                    description: "请在后台编辑并粘贴新片场嵌入代码",
+                    embedCode: "",
+                    cover: ""
+                };
+                const addRes = await db.collection('works').add(sample);
+                appData.works.push({ ...sample, _id: addRes.id });
+            }
+        } catch (err) {
+            console.error('加载作品失败', err);
+            showToast('加载作品失败');
+        }
+    }
+
+    // 保存个人资料（仅管理员可写）
+    async function saveProfileToCloud(profile) {
+        if (!isAdmin) return false;
+        try {
+            // 获取已有记录 id
+            const res = await db.collection('profile').get();
+            if (res.data && res.data.length > 0) {
+                const id = res.data[0]._id;
+                await db.collection('profile').doc(id).update(profile);
+            } else {
+                await db.collection('profile').add(profile);
+            }
+            return true;
+        } catch (err) {
+            console.error('保存个人信息失败', err);
+            showToast('保存个人信息失败');
             return false;
         }
-        const { error } = await supabaseAdmin
-            .from('profiles')
-            .update({
-                name: appData.name,
-                bio: appData.bio,
-                contact: appData.contact,
-                skills: appData.skills,
-                avatar: appData.avatar
-            })
-            .eq('id', 1);  // 假设只有一行 id=1
-        if (error) {
-            console.error("保存个人信息失败", error);
-            showToast("保存失败");
-            return false;
-        }
-        showToast("个人信息已保存到云端");
-        return true;
     }
 
     // 保存作品（新增或更新）
-    async function saveWorkToDatabase(work, isNew) {
-        if (!supabaseAdmin) {
-            showToast("请先登录管理员");
+    async function saveWorkToCloud(work, isNew) {
+        if (!isAdmin) return false;
+        try {
+            if (isNew) {
+                const { id, ...rest } = work; // 移除临时id
+                await db.collection('works').add(rest);
+            } else {
+                await db.collection('works').doc(work.id).update({
+                    title: work.title,
+                    category: work.category,
+                    description: work.description,
+                    embedCode: work.embedCode,
+                    cover: work.cover
+                });
+            }
+            return true;
+        } catch (err) {
+            console.error('保存作品失败', err);
+            showToast('保存作品失败');
             return false;
         }
-        if (isNew) {
-            const { error } = await supabaseAdmin
-                .from('works')
-                .insert([{
-                    title: work.title,
-                    category: work.category,
-                    description: work.description,
-                    embed_code: work.embedCode,
-                    cover_url: work.cover,
-                    createdAt: new Date().toISOString()
-                }]);
-            if (error) {
-                console.error("添加作品失败", error);
-                showToast("添加失败");
-                return false;
-            }
-        } else {
-            const { error } = await supabaseAdmin
-                .from('works')
-                .update({
-                    title: work.title,
-                    category: work.category,
-                    description: work.description,
-                    embed_code: work.embedCode,
-                    cover_url: work.cover
-                })
-                .eq('id', work.id);
-            if (error) {
-                console.error("更新作品失败", error);
-                showToast("更新失败");
-                return false;
-            }
-        }
-        showToast("保存成功");
-        return true;
     }
 
     // 删除作品
-    async function deleteWorkFromDatabase(workId) {
-        if (!supabaseAdmin) {
-            showToast("请先登录管理员");
+    async function deleteWorkFromCloud(workId) {
+        if (!isAdmin) return false;
+        try {
+            await db.collection('works').doc(workId).remove();
+            return true;
+        } catch (err) {
+            console.error('删除作品失败', err);
+            showToast('删除作品失败');
             return false;
         }
-        const { error } = await supabaseAdmin
-            .from('works')
-            .delete()
-            .eq('id', workId);
-        if (error) {
-            console.error("删除失败", error);
-            showToast("删除失败");
-            return false;
-        }
-        showToast("删除成功");
-        return true;
     }
 
-    // ---------- 渲染前端 ----------
+    // ---------- 渲染前端界面 ----------
     function renderAvatar() {
         const img = document.getElementById("avatarImg");
         const placeholder = document.getElementById("avatarPlaceholder");
@@ -479,19 +453,22 @@
         renderAvatar();
     }
 
+    const CATEGORIES = [
+        "tvc广告", "宣传片", "预告片", "微电影",
+        "纪录片", "电视节目", "短视频", "aigc视频"
+    ];
+
     function attachFilterEvents() {
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.removeEventListener('click', filterHandler);
             btn.addEventListener('click', filterHandler);
         });
     }
-
     function filterHandler(e) {
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         e.target.classList.add('active');
         renderWorks(e.target.dataset.cat);
     }
-
     function renderWorks(category) {
         const grid = document.getElementById("worksGrid");
         let filtered = [...appData.works];
@@ -501,9 +478,9 @@
             return;
         }
         grid.innerHTML = filtered.map(work => `
-            <div class="work-card" data-work-id="${work.id}">
+            <div class="work-card" data-work-id="${work._id}">
                 <div class="media-container">
-                    ${work.cover_url ? `<img src="${work.cover_url}" alt="封面">` : `<div style="position:absolute; top:0; left:0; width:100%; height:100%; background:#1a1a1a; display:flex; align-items:center; justify-content:center;">无封面</div>`}
+                    ${work.cover ? `<img src="${work.cover}" alt="封面">` : `<div style="position:absolute; top:0; left:0; width:100%; height:100%; background:#1a1a1a; display:flex; align-items:center; justify-content:center;">无封面</div>`}
                     <div class="play-icon">▶</div>
                 </div>
                 <div class="work-info">
@@ -515,7 +492,7 @@
         `).join('');
         document.querySelectorAll('.work-card').forEach(card => {
             card.addEventListener('click', () => {
-                const work = appData.works.find(w => w.id == card.dataset.workId);
+                const work = appData.works.find(w => w._id === card.dataset.workId);
                 if (work) openVideoModal(work);
             });
         });
@@ -529,9 +506,9 @@
         titleElem.innerText = work.title;
         descElem.innerText = work.description;
         container.innerHTML = '';
-        if (work.embed_code && work.embed_code.trim()) {
+        if (work.embedCode && work.embedCode.trim()) {
             const parser = new DOMParser();
-            const iframeDoc = parser.parseFromString(work.embed_code, 'text/html');
+            const iframeDoc = parser.parseFromString(work.embedCode, 'text/html');
             const iframeSrc = iframeDoc.querySelector('iframe')?.src;
             if (iframeSrc) {
                 const iframe = document.createElement('iframe');
@@ -572,6 +549,7 @@
 
     function renderWorksManager() {
         const container = document.getElementById("worksManager");
+        if (!appData.works) appData.works = [];
         container.innerHTML = appData.works.map((work, idx) => `
             <div class="work-item" data-idx="${idx}">
                 <div><strong>${escapeHtml(work.title)}</strong> (${work.category})</div>
@@ -594,10 +572,11 @@
                 const idx = parseInt(btn.dataset.idx);
                 if (confirm('删除该作品？')) {
                     const work = appData.works[idx];
-                    const success = await deleteWorkFromDatabase(work.id);
+                    const success = await deleteWorkFromCloud(work._id);
                     if (success) {
-                        await loadData();  // 重新加载数据
+                        await loadWorks();   // 重新拉取
                         renderWorksManager();
+                        renderFrontend();
                     }
                 }
             });
@@ -611,13 +590,12 @@
         document.getElementById("workTitle").value = work.title;
         document.getElementById("workCategory").value = work.category;
         document.getElementById("workDesc").value = work.description;
-        document.getElementById("workEmbed").value = work.embed_code || '';
-        document.getElementById("workCoverUrl").value = work.cover_url || '';
+        document.getElementById("workEmbed").value = work.embedCode || '';
+        document.getElementById("workCoverUrl").value = work.cover || '';
         const previewDiv = document.getElementById("coverUrlPreview");
-        const previewImg = previewDiv.querySelector('img');
-        if (work.cover_url) {
+        if (work.cover) {
             previewDiv.style.display = 'block';
-            previewImg.src = work.cover_url;
+            previewDiv.querySelector('img').src = work.cover;
         } else {
             previewDiv.style.display = 'none';
         }
@@ -638,40 +616,35 @@
         const embedCode = document.getElementById("workEmbed").value.trim();
         const coverUrl = document.getElementById("workCoverUrl").value.trim();
         const work = appData.works[currentEditingWorkIndex];
-        const isNew = (work.id === undefined);
-        const updatedWork = {
-            id: work.id,
-            title: title,
-            category: category,
-            description: desc,
-            embedCode: embedCode,
-            cover: coverUrl
-        };
-        const success = await saveWorkToDatabase(updatedWork, isNew);
+        const isNew = !work._id;  // 正常情况下都有_id，但以防万一
+        const success = await saveWorkToCloud({
+            id: work._id,
+            title, category, description: desc, embedCode, cover: coverUrl
+        }, isNew);
         if (success) {
-            await loadData();
+            await loadWorks();
             renderWorksManager();
+            renderFrontend();
             closeWorkEditor();
         }
     }
 
     async function addNewWork() {
-        // 创建一个临时作品对象，id 临时为 Date.now()
-        const newWork = {
-            id: Date.now(),
+        const success = await saveWorkToCloud({
             title: "新作品标题",
             category: "短视频",
             description: "作品描述，可自行修改。",
             embedCode: '<iframe src="https://player.youku.com/embed/请替换视频链接" frameborder="0" allowfullscreen></iframe>',
             cover: ""
-        };
-        const success = await saveWorkToDatabase(newWork, true);
+        }, true);
         if (success) {
-            await loadData();
-            // 找到新插入的作品的索引
-            const newIdx = appData.works.findIndex(w => w.title === "新作品标题");
-            if (newIdx !== -1) openWorkEditor(newIdx);
+            await loadWorks();
             renderWorksManager();
+            renderFrontend();
+            // 打开最后新增的作品进行编辑
+            if (appData.works.length > 0) {
+                openWorkEditor(appData.works.length - 1);
+            }
         }
     }
 
@@ -684,22 +657,24 @@
         if (cropper) cropper.destroy();
         cropper = new Cropper(img, { aspectRatio: 1, viewMode: 1, dragMode: 'move', cropBoxMovable: true, cropBoxResizable: true });
     }
-
     function confirmCrop() {
         if (!cropper) return;
         const canvas = cropper.getCroppedCanvas();
         const base64 = canvas.toDataURL('image/jpeg', 0.9);
         appData.avatar = base64;
-        renderAvatar();
-        // 立即保存到数据库
-        if (supabaseAdmin) {
-            saveProfileToDatabase();
+        if (isAdmin) {
+            saveProfileToCloud({ avatar: base64 });
         } else {
             showToast("请先登录管理员再保存头像");
         }
         closeCropModal();
+        renderAvatar();
+        const previewImg = document.getElementById("adminAvatarPreview");
+        const previewPlaceholder = document.getElementById("adminAvatarPlaceholder");
+        previewImg.src = base64;
+        previewImg.style.display = "block";
+        previewPlaceholder.style.display = "none";
     }
-
     function closeCropModal() {
         document.getElementById("cropModal").style.display = "none";
         if (cropper) { cropper.destroy(); cropper = null; }
@@ -723,29 +698,25 @@
         renderWorksManager();
         document.getElementById("adminModal").style.display = "flex";
     }
-
     function closeAdminModal() { document.getElementById("adminModal").style.display = "none"; }
-
     async function saveAdminChanges() {
-        appData.name = document.getElementById("editName").value.trim();
-        appData.bio = document.getElementById("editBio").value;
-        appData.contact = document.getElementById("editContact").value;
-        appData.skills = document.getElementById("editSkills").value;
-        await saveProfileToDatabase();
+        await saveProfileToCloud({
+            name: document.getElementById("editName").value.trim(),
+            bio: document.getElementById("editBio").value,
+            contact: document.getElementById("editContact").value,
+            skills: document.getElementById("editSkills").value,
+            avatar: appData.avatar
+        });
+        await loadProfile();
         renderFrontend();
         closeAdminModal();
     }
+    function handleAvatarUpload(file) { if (file) showCropModal(file); }
 
-    function handleAvatarUpload(file) {
-        if (file) showCropModal(file);
-    }
-
-    // 登录逻辑
+    // 登录退出
     function attemptLogin() {
         const pwd = document.getElementById("adminPassword").value;
         if (pwd === "ysy2025") {
-            // 初始化管理员客户端
-            supabaseAdmin = supabase.createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
             isAdmin = true;
             sessionStorage.setItem("admin", "true");
             closeLoginModal();
@@ -755,36 +726,26 @@
             showToast("密码错误");
         }
     }
-
     function logout() {
         isAdmin = false;
-        supabaseAdmin = null;
         sessionStorage.removeItem("admin");
         renderAdminButton();
         closeAdminModal();
         showToast("已退出登录");
     }
-
     function closeLoginModal() {
         document.getElementById("loginModal").style.display = "none";
         document.getElementById("adminPassword").value = "";
     }
-
     function checkAdminStatus() {
-        if (sessionStorage.getItem("admin") === "true") {
-            isAdmin = true;
-            supabaseAdmin = supabase.createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-        } else {
-            isAdmin = false;
-            supabaseAdmin = null;
-        }
+        isAdmin = (sessionStorage.getItem("admin") === "true");
         renderAdminButton();
     }
 
-    // 预览封面URL
     function setupCoverPreview() {
         const input = document.getElementById("workCoverUrl");
         const previewDiv = document.getElementById("coverUrlPreview");
+        if (!previewDiv) return;
         const img = previewDiv.querySelector('img');
         input.addEventListener('input', () => {
             const url = input.value.trim();
@@ -797,14 +758,16 @@
         });
     }
 
-    // 初始化
+    // 全量初始化
     async function init() {
-        // 先加载数据
-        await loadData();
+        await ensureLogin();
+        await loadProfile();
+        await loadWorks();
+        renderFrontend();
         checkAdminStatus();
         setupCoverPreview();
 
-        // 绑定事件
+        // 事件绑定
         document.getElementById("submitLoginBtn").addEventListener("click", attemptLogin);
         document.getElementById("closeLoginBtn").addEventListener("click", closeLoginModal);
         document.getElementById("cancelLoginBtn").addEventListener("click", closeLoginModal);
